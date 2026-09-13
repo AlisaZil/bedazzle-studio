@@ -1,0 +1,109 @@
+<div class="mosaic-outer">
+  <!-- Above the frame (not overlaid on the photo) so it's always legible
+       regardless of what's underneath. -->
+  @if (mode() === 'photo' && photoUrl()) {
+    <div class="mosaic-photo-toolbar">
+      <button type="button" class="mosaic-chip" [class.active]="adjustingPhoto()" (click)="toggleAdjustPhoto($event)">
+        {{ adjustingPhoto() ? 'Confirm' : 'Move & resize' }}
+      </button>
+    </div>
+  }
+
+  <div class="mosaic-wrap">
+    <div #viewport class="mosaic-viewport" [style.--aspect]="shapeRatio()" [class.pan-mode]="panMode() || panning()" (wheel)="onWheel($event)">
+      <div
+        #surface
+        class="mosaic-surface"
+        [style.background-color]="backgroundColor()"
+        [style.transform]="surfaceTransform()"
+        (pointerdown)="onSurfacePointerDown($event)"
+        (pointermove)="onSurfacePointerMove($event)"
+        (pointerup)="onSurfacePointerUp($event)"
+        (pointercancel)="onSurfacePointerUp($event)"
+        (pointerleave)="onSurfaceLeave()"
+      >
+        <img
+          class="mosaic-photo"
+          [class.visible]="mode() === 'photo' && displayedPhotoUrl()"
+          [class.adjusting]="adjustingPhoto()"
+          [src]="displayedPhotoUrl()"
+          [style.left.%]="photoLeftPct()"
+          [style.top.%]="photoTopPct()"
+          [style.width.%]="photoWidthPct()"
+          [style.height.%]="photoHeightPct()"
+          alt=""
+          (pointerdown)="onPhotoPointerDown($event)"
+          (pointermove)="onPhotoPointerMove($event)"
+          (pointerup)="onPhotoPointerUp($event)"
+          (pointercancel)="onPhotoPointerUp($event)"
+        />
+
+        <!-- A dedicated overlay (not the surface's own background) so grid
+             lines paint on top of the photo instead of being hidden behind it —
+             an opaque photo <img> would otherwise cover a background-image set
+             directly on the surface. -->
+        <div
+          class="mosaic-grid"
+          [style.opacity]="effectiveGridOpacity()"
+          [style.--grid-cell-width.%]="cellWidthPct()"
+          [style.--grid-cell-height.%]="cellHeightPct()"
+        ></div>
+
+        @for (cell of cells(); track cell.row + ':' + cell.col) {
+          <img
+            class="mosaic-gem"
+            [class.pop]="isFresh(cell)"
+            [src]="gemSrc(cell.colourId)"
+            [style.left.%]="cellRect(cell.row, cell.col).leftPct"
+            [style.top.%]="cellRect(cell.row, cell.col).topPct"
+            [style.width.%]="cellRect(cell.row, cell.col).widthPct"
+            [style.height.%]="cellRect(cell.row, cell.col).heightPct"
+            alt=""
+          />
+        }
+
+        @if (hoverCell(); as hover) {
+          <div
+            class="mosaic-hover-highlight"
+            [style.left.%]="brushRect(hover.row, hover.col).leftPct"
+            [style.top.%]="brushRect(hover.row, hover.col).topPct"
+            [style.width.%]="brushRect(hover.row, hover.col).widthPct"
+            [style.height.%]="brushRect(hover.row, hover.col).heightPct"
+          ></div>
+          @if (hoverPreviewVisible()) {
+            <img
+              class="mosaic-hover-preview"
+              [src]="gemSrc(selectedColourId())"
+              [style.left.%]="cellRect(hover.row, hover.col).leftPct"
+              [style.top.%]="cellRect(hover.row, hover.col).topPct"
+              [style.width.%]="cellRect(hover.row, hover.col).widthPct"
+              [style.height.%]="cellRect(hover.row, hover.col).heightPct"
+              alt=""
+            />
+          }
+        }
+
+        @if (mode() === 'photo' && !photoUrl()) {
+          <button type="button" class="mosaic-upload" (pointerdown)="$event.stopPropagation()" (click)="openFilePicker($event)">
+            Choose photo
+          </button>
+        }
+      </div>
+
+      @if (mode() === 'photo' && photoUrl() && adjustingPhoto()) {
+        <div class="mosaic-photo-zoom" (pointerdown)="$event.stopPropagation()">
+          <app-gem-size-control
+            label="Zoom"
+            [value]="photoScale()"
+            [min]="photoZoomMin()"
+            [max]="photoZoomMax()"
+            [step]="0.02"
+            (valueInput)="onZoomInput($event)"
+          />
+        </div>
+      }
+    </div>
+
+    <input #fileInput type="file" accept="image/*" class="visually-hidden" (change)="onFileChange($event)" tabindex="-1" />
+  </div>
+</div>

@@ -1,0 +1,199 @@
+<div class="mosaic">
+  <div class="mosaic__bg-switch">
+    <app-segmented-switch
+      [options]="backgroundOptions"
+      [value]="store.mode()"
+      ariaLabel="Canvas background"
+      (valueChange)="onBackgroundModeChange($event)"
+    />
+
+    <!-- Desktop-only: the mobile panel keeps its own Canvas shape/Zoom
+         sections (see panelContent's --top-bar-hidden sections below). -->
+    <div class="mosaic__top-extra">
+      <span class="mosaic__divider" aria-hidden="true"></span>
+
+      <div class="mosaic__shape-field">
+        <span class="mosaic__field-label">Canvas shape</span>
+        <app-canvas-shape-select [value]="store.canvasShapeId()" (valueChange)="onCanvasShapeRequested($event)" />
+      </div>
+
+      <span class="mosaic__spacer"></span>
+
+      <div class="mosaic__zoom-field">
+        <span class="mosaic__field-label">View zoom</span>
+        <app-zoom-controls [zoom]="zoom()" [min]="zoomMin" [max]="zoomMax" (zoomOut)="onZoomOut()" (zoomIn)="onZoomIn()" (reset)="onZoomReset()" />
+        <button type="button" class="mosaic__fit-btn" (click)="mosaicCanvasRef.resetView()">
+          <span aria-hidden="true">⛶</span>
+          Fit
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="mosaic__canvas-region">
+    <app-mosaic-canvas
+      #mosaicCanvasRef
+      [mode]="store.mode()"
+      [backgroundColor]="store.backgroundColor()"
+      [photoUrl]="store.photoUrl()"
+      [resolution]="store.resolution()"
+      [shapeRatio]="shapeRatio()"
+      [canvasWidth]="store.canvasWidth()"
+      [canvasHeight]="store.canvasHeight()"
+      [showGrid]="store.showGrid()"
+      [gridOpacity]="store.gridOpacity()"
+      [cells]="store.cells()"
+      [selectedColourId]="store.selectedColourId()"
+      [tool]="store.tool()"
+      [brushSize]="store.brushSize()"
+      [zoom]="zoom()"
+      [panMode]="panMode()"
+      [photoOffsetX]="store.photoOffsetX()"
+      [photoOffsetY]="store.photoOffsetY()"
+      [photoScale]="store.photoScale()"
+      [photoZoomMin]="store.photoZoomRange.min"
+      [photoZoomMax]="store.photoZoomRange.max"
+      (cellStrokeStart)="onCellStrokeStart()"
+      (cellPaint)="onCellPaint($event)"
+      (cellStrokeEnd)="onCellStrokeEnd()"
+      (photoFileSelected)="onPhotoFileSelected($event)"
+      (zoomChange)="onZoomChange($event)"
+      (photoOffsetChange)="store.setPhotoOffset($event.x, $event.y)"
+      (photoScaleChange)="store.setPhotoScale($event)"
+      (adjustingPhotoChange)="adjustingPhoto.set($event)"
+    />
+  </div>
+
+  <app-editor-hint class="mosaic__hint" [text]="hintText()" />
+
+  <app-mosaic-toolbar
+    class="mosaic__toolbar"
+    [mode]="store.mode()"
+    [tool]="store.tool()"
+    [panMode]="panMode()"
+    [canUndo]="store.canUndo()"
+    [canRestart]="store.canRestart()"
+    (replacePhoto)="mosaicCanvasRef.triggerUpload()"
+    (toolChange)="store.setTool($event)"
+    (panModeToggle)="onTogglePan()"
+    (undo)="store.undo()"
+    (restart)="onRestartClick()"
+    (openPanel)="mobilePanelOpen.set(true)"
+  />
+
+  <aside class="mosaic__aside">
+    <ng-container *ngTemplateOutlet="panelContent" />
+  </aside>
+
+  <app-gem-sheet [open]="mobilePanelOpen()" title="Gem mosaic" [showConfirm]="false" (closed)="mobilePanelOpen.set(false)">
+    <ng-container *ngTemplateOutlet="panelContent" />
+  </app-gem-sheet>
+
+  <app-confirm-dialog
+    [open]="pendingResolution() !== null"
+    title="Start a new grid?"
+    message="Changing resolution clears the current grid. Your placed gems will be lost unless you undo."
+    confirmLabel="Start new grid"
+    cancelLabel="Cancel"
+    (confirmed)="onConfirmResolutionChange()"
+    (cancelled)="onCancelResolutionChange()"
+  />
+
+  <app-confirm-dialog
+    [open]="pendingCanvasShape() !== null"
+    title="Change the canvas shape?"
+    message="This clears the current grid. Your background or photo stays."
+    confirmLabel="Change shape"
+    cancelLabel="Cancel"
+    (confirmed)="onConfirmCanvasShapeChange()"
+    (cancelled)="onCancelCanvasShapeChange()"
+  />
+
+  <app-confirm-dialog
+    [open]="showRestartConfirm()"
+    title="Restart this mosaic?"
+    message="This clears every placed gem. Your background or photo stays."
+    confirmLabel="Restart"
+    cancelLabel="Cancel"
+    (confirmed)="onRestartConfirm()"
+    (cancelled)="onRestartCancel()"
+  />
+
+  <app-photo-setup-dialog
+    [open]="photoSetupOpen()"
+    [photoUrl]="pendingPhotoUrl()"
+    [canvasShapeId]="store.canvasShapeId()"
+    [zoomMin]="store.photoZoomRange.min"
+    [zoomMax]="store.photoZoomRange.max"
+    (canvasShapeRequested)="onCanvasShapeRequested($event)"
+    (confirmed)="onPhotoSetupConfirmed($event)"
+    (cancelled)="onPhotoSetupCancelled()"
+  />
+</div>
+
+<ng-template #panelContent>
+  <div class="mosaic-panel">
+    <h2 class="mosaic-panel__title">Gem mosaic</h2>
+    <p class="mosaic-panel__subtitle">A little sparkle, one square at a time.</p>
+
+    <section class="mosaic-panel__section mosaic-panel__section--top-bar">
+      <h3 class="mosaic-panel__heading">Canvas shape</h3>
+      <app-canvas-shape-control [value]="store.canvasShapeId()" (valueChange)="onCanvasShapeRequested($event)" />
+    </section>
+
+    <section class="mosaic-panel__section">
+      <h3 class="mosaic-panel__heading">Grid detail</h3>
+      <app-grid-resolution-control [value]="store.resolution()" [shapeRatio]="shapeRatio()" (valueChange)="onResolutionRequested($event)" />
+    </section>
+
+    <section class="mosaic-panel__section">
+      <h3 class="mosaic-panel__heading">Brush size</h3>
+      <div class="brush-size__options">
+        @for (size of store.brushSizes; track size) {
+          <button
+            type="button"
+            class="brush-size__btn"
+            [class.active]="size === store.brushSize()"
+            [attr.aria-pressed]="size === store.brushSize()"
+            (click)="store.setBrushSize(size)"
+          >
+            {{ size }}
+          </button>
+        }
+      </div>
+    </section>
+
+    <section class="mosaic-panel__section">
+      <h3 class="mosaic-panel__heading">Gem colours</h3>
+      <app-gem-colour-box [swatches]="catalogue" [selectedId]="store.selectedColourId()" (colourChange)="store.setSelectedColour($event)" />
+    </section>
+
+    <section class="mosaic-panel__section">
+      <h3 class="mosaic-panel__heading">Grid appearance</h3>
+      <label class="mosaic-panel__toggle-row">
+        <span>Show grid</span>
+        <span class="toggle-switch">
+          <input type="checkbox" [checked]="store.showGrid()" (change)="store.setShowGrid($any($event.target).checked)" />
+          <span class="toggle-switch__track"><span class="toggle-switch__thumb"></span></span>
+        </span>
+      </label>
+
+      @if (store.showGrid()) {
+        <app-gem-size-control
+          label="Grid opacity"
+          [value]="gridOpacityPercent()"
+          [min]="10"
+          [max]="100"
+          [step]="5"
+          [showValue]="true"
+          (valueInput)="onGridOpacityInput($event)"
+        />
+      }
+    </section>
+
+    <section class="mosaic-panel__section mosaic-panel__section--top-bar">
+      <h3 class="mosaic-panel__heading">Zoom</h3>
+      <app-zoom-controls [zoom]="zoom()" [min]="zoomMin" [max]="zoomMax" (zoomOut)="onZoomOut()" (zoomIn)="onZoomIn()" (reset)="onZoomReset()" />
+    </section>
+  </div>
+</ng-template>

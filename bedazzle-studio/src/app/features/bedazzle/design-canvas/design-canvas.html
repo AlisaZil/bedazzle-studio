@@ -1,0 +1,80 @@
+<div class="canvas-outer">
+  <!-- Above the frame (not overlaid on the photo) so it's always legible
+       regardless of what's underneath. -->
+  @if (mode() === 'photo' && photoUrl()) {
+    <div class="canvas-photo-toolbar">
+      <button type="button" class="canvas-chip" [class.active]="adjustingPhoto()" (click)="toggleAdjustPhoto($event)">
+        {{ adjustingPhoto() ? 'Confirm' : 'Move & resize' }}
+      </button>
+    </div>
+  }
+
+  <div class="canvas-wrap">
+    <div
+      #surface
+      class="canvas-surface"
+      [style.background-color]="backgroundColor()"
+      [style.--aspect]="aspectRatio()"
+      (pointerdown)="onSurfacePointerDown($event)"
+    >
+      <!-- Always rendered (not @if) so switching modes/photos crossfades this
+           layer's opacity instead of mounting/unmounting an <img>; gems below
+           sit in their own stacking layer and are never affected by this. Its
+           box (left/top/width/height) is driven by photoBox(), the same pan
+           (photoOffsetX/Y) + zoom (photoScale) math PngExport uses, so what you
+           position here is exactly what gets exported. -->
+      <img
+        class="canvas-photo"
+        [class.visible]="mode() === 'photo' && displayedPhotoUrl()"
+        [class.adjusting]="adjustingPhoto()"
+        [src]="displayedPhotoUrl()"
+        [style.left.%]="photoLeftPct()"
+        [style.top.%]="photoTopPct()"
+        [style.width.%]="photoWidthPct()"
+        [style.height.%]="photoHeightPct()"
+        alt=""
+        (pointerdown)="onPhotoPointerDown($event)"
+        (pointermove)="onPhotoPointerMove($event)"
+        (pointerup)="onPhotoPointerUp($event)"
+        (pointercancel)="onPhotoPointerUp($event)"
+      />
+
+      @for (gem of gems(); track gem.id) {
+        <app-placed-gem
+          [gem]="gem"
+          [canvasWidth]="canvasWidth()"
+          [canvasHeight]="canvasHeight()"
+          [selected]="gem.id === selectedGemId()"
+          [exiting]="exitingGemIds().has(gem.id)"
+          (activated)="onGemActivated(gem.id)"
+          (dragStart)="onGemDragStart(gem, $event)"
+          (dragMove)="onGemDragMove($event)"
+          (dragEnd)="onGemDragEndInternal()"
+          (resizeInput)="gemResizeInput.emit($event)"
+          (resizeCommitted)="gemResizeCommitted.emit($event)"
+        />
+      }
+
+      @if (mode() === 'photo' && !photoUrl()) {
+        <button type="button" class="canvas-upload" (pointerdown)="$event.stopPropagation()" (click)="openFilePicker($event)">
+          Choose photo
+        </button>
+      }
+
+      @if (mode() === 'photo' && photoUrl() && adjustingPhoto()) {
+        <div class="canvas-zoom" (pointerdown)="$event.stopPropagation()">
+          <app-gem-size-control
+            label="Zoom"
+            [value]="photoScale()"
+            [min]="photoZoomMin()"
+            [max]="photoZoomMax()"
+            [step]="0.02"
+            (valueInput)="onZoomInput($event)"
+          />
+        </div>
+      }
+    </div>
+
+    <input #fileInput type="file" accept="image/*" class="visually-hidden" (change)="onFileChange($event)" tabindex="-1" />
+  </div>
+</div>

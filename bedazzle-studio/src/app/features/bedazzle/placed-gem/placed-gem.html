@@ -1,0 +1,18 @@
+<img [src]="gem().asset.src" alt="" class="gem-img" draggable="false" />
+
+@if (entranceKind() === 'pop') {
+  <span class="sparkle sparkle--a" aria-hidden="true">✦</span>
+  <span class="sparkle sparkle--b" aria-hidden="true">✦</span>
+}
+
+<!-- Always rendered (not @if) so selecting/deselecting can fade its opacity
+     in/out via CSS instead of mounting/unmounting it; hidden + inert via
+     opacity/pointer-events when not selected. -->
+<span
+  class="resize-handle"
+  aria-hidden="true"
+  (pointerdown)="onHandlePointerDown($event)"
+  (pointermove)="onHandlePointerMove($event)"
+  (pointerup)="onHandlePointerUp($event)"
+  (pointercancel)="onHandlePointerUp($event)"
+></span>

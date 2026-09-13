@@ -1,0 +1,22 @@
+<div class="loader__art">
+  <span class="loader__sparkle loader__sparkle--left" aria-hidden="true">✦</span>
+  <span class="loader__sparkle loader__sparkle--right" aria-hidden="true">✦</span>
+  <div class="loader__shadow" aria-hidden="true"></div>
+  <img src="gems/heart-pink.png" alt="" class="loader__heart" />
+</div>
+
+<h1 class="loader__title">bedazzle studio</h1>
+<p class="loader__subtitle">Adding the sparkle…</p>
+
+<div
+  class="loader__track"
+  role="progressbar"
+  aria-label="Loading bedazzle studio"
+  [attr.aria-valuenow]="progress()"
+  aria-valuemin="0"
+  aria-valuemax="100"
+>
+  <div class="loader__fill" [style.width.%]="progress()">
+    <img src="gems/round-magenta.png" alt="" class="loader__thumb" />
+  </div>
+</div>

@@ -1,0 +1,44 @@
+<div class="toolbar">
+  <button type="button" class="toolbar__btn toolbar__btn--gems" (click)="openGems.emit()">
+    <span class="toolbar__icon" aria-hidden="true">➕</span>
+    <span>Gems</span>
+  </button>
+
+  @if (mode() === 'photo') {
+    <button type="button" class="toolbar__btn" (click)="replacePhoto.emit()">
+      <span class="toolbar__icon" aria-hidden="true">🖼</span>
+      <span>Replace photo</span>
+    </button>
+  }
+
+  <div class="toolbar__btn-wrap">
+    <button type="button" class="toolbar__btn" [class.active]="sizePopoverOpen()" (click)="openSize.emit()">
+      <span class="toolbar__icon" aria-hidden="true">◆</span>
+      <span>Size</span>
+    </button>
+    <app-gem-size-popover
+      [open]="sizePopoverOpen()"
+      [previewSrc]="sizePreviewSrc()"
+      [value]="gemSize()"
+      [min]="sizeMin()"
+      [max]="sizeMax()"
+      (valueInput)="sizeInput.emit($event)"
+      (valueCommitted)="sizeCommitted.emit($event)"
+      (closed)="closeSize.emit()"
+    />
+  </div>
+
+  <button type="button" class="toolbar__btn" [class.active]="randomMode()" (click)="randomModeToggle.emit()">
+    <span class="toolbar__icon" aria-hidden="true">⤮</span>
+    <span>Random</span>
+  </button>
+  <span class="toolbar__divider" aria-hidden="true"></span>
+  <button type="button" class="toolbar__btn" [disabled]="!canUndo()" (click)="undo.emit()">
+    <span class="toolbar__icon" aria-hidden="true">↶</span>
+    <span>Undo</span>
+  </button>
+  <button type="button" class="toolbar__btn" [disabled]="!canRestart()" (click)="restart.emit()">
+    <span class="toolbar__icon" aria-hidden="true">↺</span>
+    <span>Restart</span>
+  </button>
+</div>

@@ -1,0 +1,198 @@
+@use '../../../shared/styles/animations';
+
+.mosaic-outer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+}
+
+.mosaic-photo-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  flex-shrink: 0;
+}
+
+.mosaic-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+  container-type: size;
+}
+
+.mosaic-viewport {
+  position: relative;
+  overflow: hidden;
+  width: min(100cqw, 100cqh * var(--aspect, 1));
+  aspect-ratio: var(--aspect, 1);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  touch-action: none;
+  isolation: isolate;
+
+  &.pan-mode {
+    cursor: grab;
+  }
+}
+
+.mosaic-surface {
+  position: absolute;
+  inset: 0;
+  transform-origin: center center;
+  // Zoom/pan apply via `transform` (set inline); painting reads pointer
+  // position through the *current* rendered box each time, so hit-testing
+  // stays correct at any zoom/pan without extra bookkeeping.
+}
+
+// Grid lines live on their own overlay — not the surface's own background —
+// specifically so they paint *above* the photo (an opaque <img> would
+// otherwise hide a background-image set directly on the surface behind it).
+// Still a background pattern rather than per-cell borders, so an empty grid
+// costs zero extra DOM nodes regardless of resolution. Opacity (both the
+// on/off toggle and the intensity slider) is set inline by the component.
+.mosaic-grid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  background-image:
+    repeating-linear-gradient(to right, rgba(53, 36, 63, 0.4) 0 1px, transparent 1px 100%),
+    repeating-linear-gradient(to bottom, rgba(53, 36, 63, 0.4) 0 1px, transparent 1px 100%);
+  background-size: var(--grid-cell-width) 100%, 100% var(--grid-cell-height);
+  transition: opacity var(--motion-fast) var(--ease-standard);
+}
+
+.mosaic-photo {
+  position: absolute;
+  z-index: 0;
+  // No object-fit — its box (left/top/width/height, bound above from
+  // photoBox()) is already computed to exactly preserve the image's natural
+  // aspect at the current pan/zoom, so it's never stretched or cropped by CSS.
+  touch-action: none;
+  opacity: 0;
+  transition: opacity 200ms var(--ease-standard);
+
+  &.visible {
+    opacity: 1;
+  }
+
+  &.adjusting {
+    cursor: grab;
+
+    &:active {
+      cursor: grabbing;
+    }
+  }
+}
+
+.mosaic-gem {
+  position: absolute;
+  z-index: 2;
+  pointer-events: none;
+  object-fit: contain;
+  filter: drop-shadow(0 1px 2px rgba(53, 36, 63, 0.25));
+
+  &.pop {
+    animation: gem-pop-in 220ms var(--ease-standard) both;
+
+    @media (prefers-reduced-motion: reduce) {
+      animation-duration: 0.01ms;
+    }
+  }
+}
+
+.mosaic-hover-highlight {
+  position: absolute;
+  z-index: 2;
+  background: rgba(107, 79, 187, 0.14);
+  pointer-events: none;
+}
+
+.mosaic-hover-preview {
+  position: absolute;
+  z-index: 2;
+  pointer-events: none;
+  object-fit: contain;
+  opacity: 0.55;
+}
+
+.mosaic-upload {
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  min-height: var(--touch-target);
+  padding: 0 var(--space-6);
+  border: none;
+  border-radius: var(--radius-pill);
+  background: var(--color-accent);
+  color: var(--color-accent-contrast);
+  font-size: 1rem;
+  font-weight: 700;
+  box-shadow: var(--shadow-md);
+  cursor: pointer;
+  transition: background-color var(--motion-fast) var(--ease-standard);
+
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      background: var(--color-accent-strong);
+    }
+  }
+}
+
+.mosaic-chip {
+  min-height: 36px;
+  padding: 0 var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition:
+    background-color var(--motion-fast) var(--ease-standard),
+    color var(--motion-fast) var(--ease-standard);
+
+  @media (hover: hover) and (pointer: fine) {
+    &:hover:not(.active) {
+      background: var(--color-border);
+    }
+  }
+
+  &.active {
+    background: var(--color-accent);
+    border-color: var(--color-accent);
+    color: var(--color-accent-contrast);
+  }
+}
+
+.mosaic-photo-zoom {
+  position: absolute;
+  left: 50%;
+  bottom: var(--space-4);
+  transform: translateX(-50%);
+  width: min(260px, calc(100% - var(--space-6)));
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}

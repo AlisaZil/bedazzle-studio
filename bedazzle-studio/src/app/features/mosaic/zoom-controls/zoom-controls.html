@@ -1,0 +1,9 @@
+<div class="zoom">
+  <button type="button" class="zoom__btn" [disabled]="zoom() <= min()" (click)="zoomOut.emit()" aria-label="Zoom out">
+    −
+  </button>
+  <button type="button" class="zoom__percent" (click)="reset.emit()" title="Reset zoom">{{ percent() }}%</button>
+  <button type="button" class="zoom__btn" [disabled]="zoom() >= max()" (click)="zoomIn.emit()" aria-label="Zoom in">
+    +
+  </button>
+</div>

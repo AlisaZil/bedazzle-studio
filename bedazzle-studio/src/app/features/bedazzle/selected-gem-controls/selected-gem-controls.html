@@ -1,0 +1,27 @@
+<div class="selected-controls">
+  <div class="selected-controls__header">
+    <img [src]="assetSrc()" alt="" class="selected-controls__thumb" />
+    <div>
+      <p class="selected-controls__title">Selected gem</p>
+      <p class="selected-controls__name">{{ assetLabel() }}</p>
+    </div>
+  </div>
+
+  <app-gem-size-control
+    label="Size"
+    [value]="size()"
+    [min]="sizeMin()"
+    [max]="sizeMax()"
+    (valueInput)="sizeInput.emit($event)"
+    (valueCommitted)="sizeCommitted.emit($event)"
+  />
+
+  <div class="selected-controls__actions">
+    <button type="button" class="selected-controls__action" (click)="duplicate.emit()">
+      <span aria-hidden="true">⧉</span><span>Duplicate</span>
+    </button>
+    <button type="button" class="selected-controls__action selected-controls__action--danger" (click)="delete.emit()">
+      <span aria-hidden="true">🗑</span><span>Delete</span>
+    </button>
+  </div>
+</div>

@@ -1,0 +1,15 @@
+<div class="colour-box">
+  <div class="colour-box__grid">
+    @for (swatch of swatches(); track swatch.id) {
+      <app-gem-colour-compartment
+        [swatch]="swatch"
+        [selected]="swatch.id === selectedId()"
+        (picked)="colourChange.emit(swatch.id)"
+      />
+    }
+  </div>
+
+  @if (selectedSwatch(); as swatch) {
+    <p class="colour-box__selected">Selected: <strong>{{ swatch.label }}</strong></p>
+  }
+</div>

@@ -1,0 +1,26 @@
+// Shared press/hover feedback for buttons across the editor: on desktop
+// hover, background eases to a light lilac; on press, only the button's
+// inner content (icon/label) scales down slightly — the button's own box
+// (its hit area) never moves or resizes. Disabled state fades colour/opacity
+// instead of snapping. `@include` this into any interactive button.
+@mixin press-feedback {
+  transition:
+    background-color var(--motion-fast) var(--ease-standard),
+    color var(--motion-fast) var(--ease-standard),
+    border-color var(--motion-fast) var(--ease-standard),
+    opacity var(--motion-fast) var(--ease-standard);
+
+  > * {
+    transition: transform var(--motion-fast) var(--ease-standard);
+  }
+
+  &:active:not(:disabled) > * {
+    transform: scale(0.96);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    &:hover:not(:disabled) {
+      background: var(--color-surface-alt);
+    }
+  }
+}

@@ -1,0 +1,14 @@
+<div class="shape">
+  @for (shape of shapes; track shape.id) {
+    <button
+      type="button"
+      class="shape__btn"
+      [class.active]="shape.id === value()"
+      [attr.aria-pressed]="shape.id === value()"
+      (click)="valueChange.emit(shape.id)"
+    >
+      <span class="shape__swatch" [style.aspect-ratio]="shape.ratio" aria-hidden="true"></span>
+      <span>{{ shape.label }}</span>
+    </button>
+  }
+</div>

@@ -1,0 +1,19 @@
+<button
+  type="button"
+  class="compartment"
+  [class.selected]="selected()"
+  [attr.aria-pressed]="selected()"
+  [attr.aria-label]="swatch().label"
+  (click)="picked.emit()"
+>
+  <img
+    [src]="swatch().compartmentSrc"
+    alt=""
+    class="compartment__img"
+    [class.popping]="popping()"
+    (animationend)="onPopAnimationEnd()"
+  />
+  @if (selected()) {
+    <span class="compartment__check" aria-hidden="true">✓</span>
+  }
+</button>

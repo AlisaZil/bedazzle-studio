@@ -1,0 +1,65 @@
+// Shared keyframes for small, playful motion used across the gem editor.
+// `@use`-d from each component's stylesheet — Angular compiles component
+// styles independently, so this keeps one source of truth even though the
+// rules are duplicated per compiled component bundle.
+
+// A freshly-placed/duplicated/randomized gem: quick pop with a restrained
+// overshoot (scale 0.7 -> 1.08 -> 1), fading in during the first part.
+@keyframes gem-pop-in {
+  0% {
+    transform: scale(0.7);
+    opacity: 0;
+  }
+  55% {
+    transform: scale(1.08);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+// A gem restored by undo: no bounce, just a short, plain fade — it isn't a
+// new placement, so it shouldn't replay the celebratory pop.
+@keyframes gem-fade-in {
+  from {
+    transform: scale(0.94);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+// Deleted / undone-away / restarted-away gem: shrink slightly and fade out
+// before it's actually removed from state.
+@keyframes gem-fade-out {
+  from {
+    transform: scale(1);
+    opacity: 1;
+  }
+  to {
+    transform: scale(0.85);
+    opacity: 0;
+  }
+}
+
+// Two tiny sparkles that appear beside a freshly-placed gem and fade out
+// quickly. Each user sets its own end position via a CSS variable so the
+// two sparkles can drift to different corners.
+@keyframes sparkle-pop {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.4);
+  }
+  35% {
+    opacity: 1;
+    transform: translate(calc(var(--sparkle-x, 8px) * 0.5), calc(var(--sparkle-y, -8px) * 0.5)) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--sparkle-x, 8px), var(--sparkle-y, -8px)) scale(0.7);
+  }
+}

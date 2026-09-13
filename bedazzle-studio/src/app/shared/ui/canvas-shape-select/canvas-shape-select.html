@@ -1,0 +1,37 @@
+<div class="shape-select">
+  <button
+    type="button"
+    class="shape-select__trigger"
+    [class.open]="open()"
+    (click)="toggle()"
+    aria-haspopup="listbox"
+    [attr.aria-expanded]="open()"
+  >
+    <span class="shape-select__icon" [style.aspect-ratio]="selected().ratio" aria-hidden="true"></span>
+    <span class="shape-select__label">{{ selected().label }}</span>
+    <span class="shape-select__chevron" [class.flipped]="open()" aria-hidden="true">⌄</span>
+  </button>
+
+  @if (open()) {
+    <ul class="shape-select__menu" role="listbox">
+      @for (shape of shapes; track shape.id) {
+        <li role="presentation">
+          <button
+            type="button"
+            class="shape-select__option"
+            [class.selected]="shape.id === value()"
+            role="option"
+            [attr.aria-selected]="shape.id === value()"
+            (click)="select(shape.id)"
+          >
+            <span class="shape-select__icon" [style.aspect-ratio]="shape.ratio" aria-hidden="true"></span>
+            <span class="shape-select__label">{{ shape.label }}</span>
+            @if (shape.id === value()) {
+              <span class="shape-select__check" aria-hidden="true">✓</span>
+            }
+          </button>
+        </li>
+      }
+    </ul>
+  }
+</div>

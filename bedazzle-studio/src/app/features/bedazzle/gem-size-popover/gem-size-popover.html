@@ -1,0 +1,21 @@
+@if (open()) {
+  <div class="size-popover" role="dialog" aria-label="Gem size">
+    <div class="size-popover__preview">
+      @if (previewSrc(); as src) {
+        <img [src]="src" alt="" class="size-popover__preview-img size-popover__preview-img--sm" />
+      }
+      <app-gem-size-control
+        label="Gem size"
+        [value]="value()"
+        [min]="min()"
+        [max]="max()"
+        (valueInput)="valueInput.emit($event)"
+        (valueCommitted)="valueCommitted.emit($event)"
+      />
+      @if (previewSrc(); as src) {
+        <img [src]="src" alt="" class="size-popover__preview-img size-popover__preview-img--lg" />
+      }
+    </div>
+    <p class="size-popover__value">{{ value() }}px</p>
+  </div>
+}

@@ -1,0 +1,21 @@
+.colour-box {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.colour-box__grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: var(--space-2);
+}
+
+.colour-box__selected {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+
+  strong {
+    color: var(--color-text);
+  }
+}

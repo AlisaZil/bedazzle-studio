@@ -1,0 +1,104 @@
+.size-control {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.size-control__label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.size-control__row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.size-control__icon {
+  color: var(--color-accent);
+  line-height: 1;
+
+  &--sm {
+    font-size: 0.55rem;
+  }
+
+  &--lg {
+    font-size: 1.1rem;
+  }
+}
+
+.size-control__value {
+  min-width: 2.8em;
+  color: var(--color-text-muted);
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-align: right;
+}
+
+.size-control__input {
+  flex: 1;
+  height: var(--touch-target);
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+
+  &::-webkit-slider-runnable-track {
+    height: 6px;
+    border-radius: var(--radius-pill);
+    background: var(--color-border);
+  }
+
+  &::-moz-range-track {
+    height: 6px;
+    border-radius: var(--radius-pill);
+    background: var(--color-border);
+  }
+
+  // Thumb position itself is native (the browser moves it with the pointer
+  // with zero added lag); only its scale/halo — a purely decorative touch —
+  // transitions, so it grows on press and eases back on release without
+  // ever making the thumb trail behind the pointer.
+  &::-webkit-slider-thumb {
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    margin-top: -8px;
+    border-radius: 50%;
+    background: var(--color-accent);
+    border: 3px solid var(--color-surface);
+    box-shadow: var(--shadow-sm);
+    transition:
+      transform var(--motion-fast) var(--ease-standard),
+      box-shadow var(--motion-fast) var(--ease-standard);
+  }
+
+  &::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--color-accent);
+    border: 3px solid var(--color-surface);
+    box-shadow: var(--shadow-sm);
+    transition:
+      transform var(--motion-fast) var(--ease-standard),
+      box-shadow var(--motion-fast) var(--ease-standard);
+  }
+
+  &:active::-webkit-slider-thumb,
+  &:focus-visible::-webkit-slider-thumb {
+    transform: scale(1.15);
+    box-shadow:
+      0 0 0 8px rgba(107, 79, 187, 0.18),
+      var(--shadow-sm);
+  }
+
+  &:active::-moz-range-thumb,
+  &:focus-visible::-moz-range-thumb {
+    transform: scale(1.15);
+    box-shadow:
+      0 0 0 8px rgba(107, 79, 187, 0.18),
+      var(--shadow-sm);
+  }
+}

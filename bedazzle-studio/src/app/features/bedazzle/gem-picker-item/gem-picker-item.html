@@ -1,0 +1,16 @@
+<button
+  type="button"
+  class="tile"
+  [class.selected]="selected()"
+  [attr.aria-pressed]="selected()"
+  [attr.aria-label]="asset().label"
+  (click)="picked.emit()"
+>
+  <img
+    [src]="asset().src"
+    [alt]="''"
+    class="tile__img"
+    [class.popping]="popping()"
+    (animationend)="onPopAnimationEnd()"
+  />
+</button>

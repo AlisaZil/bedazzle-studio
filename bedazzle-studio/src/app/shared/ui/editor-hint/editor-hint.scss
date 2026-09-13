@@ -1,0 +1,10 @@
+// A normal in-flow block (not absolutely positioned over the canvas) so it
+// gets its own row in the editor's layout and can never overlap the canvas
+// or the toolbar's top divider.
+.editor-hint {
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+  text-align: center;
+}

@@ -1,0 +1,16 @@
+<div class="resolution">
+  <div class="resolution__options">
+    @for (res of resolutions; track res) {
+      <button
+        type="button"
+        class="resolution__btn"
+        [class.active]="res === value()"
+        [attr.aria-pressed]="res === value()"
+        (click)="valueChange.emit(res)"
+      >
+        {{ dimensionsFor(res).cols }} × {{ dimensionsFor(res).rows }}
+      </button>
+    }
+  </div>
+  <p class="resolution__caption">{{ dimensionsFor(value()).cols }} columns · {{ dimensionsFor(value()).rows }} rows</p>
+</div>

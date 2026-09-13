@@ -1,0 +1,116 @@
+@use '../../../shared/styles/breakpoints' as bp;
+@use '../../../shared/styles/buttons' as btn;
+
+:host {
+  display: contents;
+}
+
+.sheet-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background: rgba(53, 36, 63, 0.35);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 260ms var(--ease-standard);
+
+  &.open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+
+.sheet {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 41;
+  display: flex;
+  flex-direction: column;
+  max-height: 85dvh;
+  background: var(--color-bg);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  box-shadow: var(--shadow-lg);
+  transform: translateY(100%);
+  transition: transform 260ms var(--ease-standard);
+  padding-bottom: max(var(--space-4), env(safe-area-inset-bottom));
+
+  &.open {
+    transform: translateY(0);
+  }
+}
+
+.sheet__handle {
+  width: 40px;
+  height: 4px;
+  margin: var(--space-3) auto;
+  border-radius: var(--radius-pill);
+  background: var(--color-border);
+  flex-shrink: 0;
+}
+
+.sheet__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--space-4) var(--space-3);
+  flex-shrink: 0;
+}
+
+.sheet__title {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.sheet__close {
+  @include btn.press-feedback;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--touch-target);
+  height: var(--touch-target);
+  border: none;
+  border-radius: 50%;
+  background: var(--color-surface);
+  cursor: pointer;
+}
+
+.sheet__body {
+  flex: 1;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
+  padding: 0 var(--space-4) var(--space-4);
+}
+
+.sheet__confirm {
+  @include btn.press-feedback;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin: var(--space-2) var(--space-4) 0;
+  min-height: 52px;
+  border: none;
+  border-radius: var(--radius-md);
+  background: var(--color-accent);
+  color: var(--color-accent-contrast);
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      background: var(--color-accent-strong);
+    }
+  }
+}
+
+@media (min-width: bp.$desktop) {
+  :host {
+    display: none;
+  }
+}

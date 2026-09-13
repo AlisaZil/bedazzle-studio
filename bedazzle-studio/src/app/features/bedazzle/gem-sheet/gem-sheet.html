@@ -1,0 +1,14 @@
+<div class="sheet-backdrop" [class.open]="open()" (click)="closed.emit()"></div>
+<div class="sheet" [class.open]="open()" role="dialog" aria-modal="true" [attr.aria-label]="title()">
+  <div class="sheet__handle"></div>
+  <div class="sheet__header">
+    <h2 class="sheet__title">{{ title() }}</h2>
+    <button type="button" class="sheet__close" (click)="closed.emit()" [attr.aria-label]="'Close ' + title()"><span>✕</span></button>
+  </div>
+  <div class="sheet__body">
+    <ng-content />
+  </div>
+  @if (showConfirm()) {
+    <button type="button" class="sheet__confirm" (click)="closed.emit()"><span>{{ confirmLabel() }}</span></button>
+  }
+</div>

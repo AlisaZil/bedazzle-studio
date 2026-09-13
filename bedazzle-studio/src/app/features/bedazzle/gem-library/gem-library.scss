@@ -1,0 +1,89 @@
+.library {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.library__tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+// Each tab animates its own background/text colour independently — there is
+// deliberately no shared sliding indicator, since tabs wrap onto a second row
+// (e.g. "Flowers") and an indicator can't travel sensibly across rows.
+.library__tab {
+  padding: var(--space-2) var(--space-4);
+  min-height: var(--touch-target);
+  border: none;
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition:
+    background 180ms var(--ease-standard),
+    color 180ms var(--ease-standard);
+
+  &.active {
+    background: var(--color-surface-alt);
+    color: var(--color-accent-strong);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    &:hover:not(.active) {
+      background: var(--color-border);
+    }
+  }
+}
+
+.library__grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-3);
+  max-height: 45vh;
+  overflow-y: auto;
+  padding: var(--space-1);
+  // No height transition here — switching categories crossfades the tiles
+  // in place rather than collapsing/expanding the panel around them.
+}
+
+// Newly-visible tiles (a fresh placement in the grid — switching category
+// reuses any tile already present in both the old and new filtered list, so
+// this only plays for the ones that actually just appeared) fade up into
+// place with a small stagger, capped at 200ms total so a big category never
+// takes long to finish settling.
+.library__grid app-gem-picker-item {
+  display: block;
+  animation: tile-enter 200ms var(--ease-standard) both;
+}
+
+@for $i from 1 through 11 {
+  .library__grid app-gem-picker-item:nth-child(#{$i}) {
+    animation-delay: #{($i - 1) * 20}ms;
+  }
+}
+
+.library__grid app-gem-picker-item:nth-child(n + 12) {
+  animation-delay: 200ms;
+}
+
+@keyframes tile-enter {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .library__grid app-gem-picker-item {
+    animation-duration: 0.01ms;
+    animation-delay: 0ms !important;
+  }
+}

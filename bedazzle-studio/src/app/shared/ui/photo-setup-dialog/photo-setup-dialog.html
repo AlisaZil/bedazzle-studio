@@ -1,0 +1,88 @@
+<dialog #dialogEl class="ps-dialog" (close)="onDialogClose()">
+  <div class="ps-topbar">
+    <span class="ps-logo">bedazzle studio <span aria-hidden="true">✨</span></span>
+    <span class="ps-steps">
+      <span class="ps-dot"></span>
+      <span class="ps-dot"></span>
+      <span class="ps-dot ps-dot--active"></span>
+      <span class="ps-steps__label">Photo setup</span>
+    </span>
+  </div>
+
+  <div class="ps-card">
+    <div class="ps-card__header">
+      <div>
+        <h2 class="ps-card__title">Position your photo</h2>
+        <p class="ps-card__subtitle">Drag to move. Adjust the scale to find your crop.</p>
+      </div>
+
+      <app-canvas-shape-select [value]="canvasShapeId()" (valueChange)="canvasShapeRequested.emit($event)" />
+    </div>
+
+    <div class="ps-crop" [style.--aspect]="shapeRatio()">
+      <div
+        #surface
+        class="ps-crop__surface"
+        (pointerdown)="onPointerDown($event)"
+        (pointermove)="onPointerMove($event)"
+        (pointerup)="onPointerUp()"
+        (pointercancel)="onPointerUp()"
+      >
+        @if (photoUrl(); as url) {
+          <img
+            class="ps-crop__photo"
+            [src]="url"
+            [style.left.%]="photoLeftPct()"
+            [style.top.%]="photoTopPct()"
+            [style.width.%]="photoWidthPct()"
+            [style.height.%]="photoHeightPct()"
+            alt=""
+            draggable="false"
+          />
+        }
+
+        <div class="ps-crop__grid" aria-hidden="true">
+          <span class="ps-crop__grid-line ps-crop__grid-line--v1"></span>
+          <span class="ps-crop__grid-line ps-crop__grid-line--v2"></span>
+          <span class="ps-crop__grid-line ps-crop__grid-line--h1"></span>
+          <span class="ps-crop__grid-line ps-crop__grid-line--h2"></span>
+        </div>
+
+        <span class="ps-crop__corner ps-crop__corner--tl" aria-hidden="true"></span>
+        <span class="ps-crop__corner ps-crop__corner--tr" aria-hidden="true"></span>
+        <span class="ps-crop__corner ps-crop__corner--bl" aria-hidden="true"></span>
+        <span class="ps-crop__corner ps-crop__corner--br" aria-hidden="true"></span>
+      </div>
+    </div>
+
+    <div class="ps-scale-row">
+      <span class="ps-scale-row__label">Photo scale</span>
+      <button type="button" class="ps-scale-row__btn" [disabled]="scale() <= zoomMin()" (click)="onZoomOut()" aria-label="Decrease scale">
+        −
+      </button>
+      <input
+        type="range"
+        class="ps-scale-row__slider"
+        [min]="zoomMin()"
+        [max]="zoomMax()"
+        step="0.02"
+        [value]="scale()"
+        (input)="onScaleInput($event)"
+        aria-label="Photo scale"
+      />
+      <button type="button" class="ps-scale-row__btn" [disabled]="scale() >= zoomMax()" (click)="onZoomIn()" aria-label="Increase scale">
+        +
+      </button>
+      <span class="ps-scale-row__percent">{{ zoomPercent() }}%</span>
+      <button type="button" class="ps-scale-row__reset" (click)="onReset()">Reset</button>
+    </div>
+
+    <div class="ps-footer">
+      <p class="ps-footer__hint">You can reposition it again later.</p>
+      <div class="ps-footer__actions">
+        <button type="button" class="ps-btn ps-btn--ghost" (click)="onCancel()">Cancel</button>
+        <button type="button" class="ps-btn ps-btn--solid" (click)="onUsePhoto()">Use photo</button>
+      </div>
+    </div>
+  </div>
+</dialog>

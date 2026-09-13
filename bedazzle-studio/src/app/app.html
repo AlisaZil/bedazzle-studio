@@ -1,0 +1,4 @@
+@if (loaderVisible()) {
+  <app-loader [progress]="progress()" [class.hide]="loaderHiding()" />
+}
+<router-outlet />

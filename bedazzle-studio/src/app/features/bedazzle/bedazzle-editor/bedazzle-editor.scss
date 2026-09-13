@@ -1,0 +1,219 @@
+@use '../../../shared/styles/breakpoints' as bp;
+
+:host {
+  display: block;
+  height: 100dvh;
+  height: 100vh; // fallback for browsers without dvh
+}
+
+.editor {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto auto 1fr auto auto auto;
+  grid-template-areas:
+    'header'
+    'bg-switch'
+    'canvas'
+    'selected'
+    'hint'
+    'toolbar';
+  height: 100%;
+  background: var(--color-bg);
+}
+
+// Fills everything below the shared header regardless of the grid's named
+// areas (which only describe the freehand layout) — line-based placement
+// works the same at both breakpoints without needing its own area names.
+.editor__mosaic-host {
+  grid-column: 1 / -1;
+  grid-row: 2 / -1;
+  min-height: 0;
+}
+
+.editor__bg-switch {
+  grid-area: bg-switch;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  justify-content: center;
+  // Matches .mosaic__bg-switch's padding exactly (both breakpoints) so this
+  // row sits at the same height regardless of which editor is showing —
+  // switching Freehand/Gem mosaic must never shift it.
+  padding: var(--space-3) var(--space-4) 0;
+}
+
+// Desktop-only extra (Canvas shape) — folded into this row instead of the
+// aside panel, which keeps that section for mobile only (see
+// .editor__shape-section--top-bar below).
+.editor__top-extra {
+  display: none;
+}
+
+.editor__hint {
+  grid-area: hint;
+}
+
+// --- One-off entrance reveal ------------------------------------------------
+// Plays exactly once, when the root loader finishes (see the `revealed` host
+// class, driven by AppReadyState) — never replayed by ordinary state changes
+// like placing gems or switching modes, since it only reacts to that one
+// signal flipping true.
+.editor__header,
+.editor__bg-switch,
+.editor__canvas-region {
+  opacity: 0;
+  transform: translateY(6px);
+  transition:
+    opacity var(--motion-panel) var(--ease-standard),
+    transform var(--motion-panel) var(--ease-standard);
+}
+
+.editor__hint,
+.editor__toolbar,
+.editor__aside {
+  opacity: 0;
+  transform: translateY(6px);
+  transition:
+    opacity var(--motion-panel) var(--ease-standard) 60ms,
+    transform var(--motion-panel) var(--ease-standard) 60ms;
+}
+
+:host(.revealed) {
+  .editor__header,
+  .editor__bg-switch,
+  .editor__canvas-region,
+  .editor__hint,
+  .editor__toolbar,
+  .editor__aside {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.editor__header {
+  grid-area: header;
+}
+
+.editor__canvas-region {
+  grid-area: canvas;
+  min-height: 0;
+  padding: var(--space-4);
+  padding-bottom: var(--space-6);
+}
+
+.editor__selected-mobile {
+  grid-area: selected;
+  padding: 0 var(--space-4) var(--space-3);
+}
+
+.editor__toolbar {
+  grid-area: toolbar;
+}
+
+.editor__aside {
+  display: none;
+}
+
+.editor__shape-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+}
+
+.editor__shape-heading {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.editor__error {
+  position: fixed;
+  left: 50%;
+  bottom: max(var(--space-4), env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  z-index: 50;
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  max-width: min(90vw, 420px);
+  background: var(--color-danger);
+  color: var(--color-danger-contrast);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+}
+
+@media (min-width: bp.$desktop) {
+  .editor {
+    grid-template-columns: 1fr 360px;
+    grid-template-rows: auto auto 1fr auto auto;
+    grid-template-areas:
+      'header header'
+      'bg-switch aside'
+      'canvas aside'
+      'hint aside'
+      'toolbar aside';
+  }
+
+  .editor__bg-switch {
+    justify-content: flex-start;
+    padding: var(--space-4) var(--space-4) 0;
+
+    app-segmented-switch {
+      display: block;
+      max-width: 280px;
+    }
+  }
+
+  .editor__top-extra {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+  }
+
+  .editor__divider {
+    width: 1px;
+    align-self: stretch;
+    background: var(--color-border);
+  }
+
+  .editor__field-label {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--color-text-muted);
+    white-space: nowrap;
+  }
+
+  .editor__shape-field {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .editor__selected-mobile {
+    display: none;
+  }
+
+  .editor__aside {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    grid-area: aside;
+    padding: var(--space-4);
+    overflow-y: auto;
+    border-left: 1px solid var(--color-border);
+    background: var(--color-surface);
+  }
+
+  // Canvas shape moves into the top toolbar row on desktop (see
+  // .editor__top-extra above) — hide its aside copy so it's not shown
+  // twice; the mobile sheet (outside .editor__aside) keeps it.
+  .editor__aside .editor__shape-section--top-bar {
+    display: none;
+  }
+
+  .editor__canvas-region {
+    padding-bottom: var(--space-4);
+  }
+}

@@ -1,0 +1,24 @@
+<label class="size-control">
+  <span class="size-control__label">{{ label() }}</span>
+  <span class="size-control__row">
+    @if (!showValue()) {
+      <span class="size-control__icon size-control__icon--sm" aria-hidden="true">◆</span>
+    }
+    <input
+      type="range"
+      class="size-control__input"
+      [min]="min()"
+      [max]="max()"
+      [step]="step()"
+      [value]="value()"
+      (input)="onInput($event)"
+      (change)="onCommit($event)"
+      [attr.aria-label]="label()"
+    />
+    @if (showValue()) {
+      <span class="size-control__value">{{ value() }}{{ valueSuffix() }}</span>
+    } @else {
+      <span class="size-control__icon size-control__icon--lg" aria-hidden="true">◆</span>
+    }
+  </span>
+</label>

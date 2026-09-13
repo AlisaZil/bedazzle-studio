@@ -1,0 +1,32 @@
+<header class="header">
+  <h1 class="header__title">{{ title() }} <span aria-hidden="true">✨</span></h1>
+
+  <div class="header__mode-slot">
+    <ng-content />
+  </div>
+
+  <button
+    type="button"
+    class="header__save"
+    [class.saving]="saveState() === 'saving'"
+    [class.success]="saveState() === 'success'"
+    [disabled]="saveState() === 'saving'"
+    (click)="save.emit()"
+  >
+    <span class="header__save-label">
+      @switch (saveState()) {
+        @case ('saving') {
+          <span class="header__spinner" aria-hidden="true"></span>
+          Saving…
+        }
+        @case ('success') {
+          <span aria-hidden="true">✓</span>
+          {{ saveMessage() }}
+        }
+        @default {
+          Save
+        }
+      }
+    </span>
+  </button>
+</header>

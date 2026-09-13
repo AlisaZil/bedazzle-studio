@@ -1,0 +1,63 @@
+@use '../../../shared/styles/buttons' as btn;
+@use '../../../shared/styles/breakpoints' as bp;
+
+.toolbar {
+  display: flex;
+  justify-content: space-around;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  padding-bottom: max(var(--space-3), env(safe-area-inset-bottom));
+  background: var(--color-surface);
+  border-top: 1px solid var(--color-border);
+}
+
+.toolbar__btn {
+  @include btn.press-feedback;
+
+  flex: 1;
+  max-width: 120px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  min-height: var(--touch-target);
+  padding: var(--space-2);
+  border: none;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--color-text);
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+
+  &.active {
+    background: var(--color-surface-alt);
+    color: var(--color-accent-strong);
+  }
+
+  &:disabled {
+    color: var(--color-text-muted);
+    opacity: 0.5;
+    cursor: default;
+  }
+}
+
+.toolbar__btn--panel {
+  @media (min-width: bp.$desktop) {
+    display: none;
+  }
+}
+
+.toolbar__icon {
+  font-size: 1.2rem;
+  display: inline-block;
+}
+
+// Separates the drawing/view tools (Paint/Eraser/Pan) from the history
+// actions (Undo/Restart) that follow them.
+.toolbar__divider {
+  align-self: center;
+  width: 1px;
+  height: 28px;
+  background: var(--color-border);
+}

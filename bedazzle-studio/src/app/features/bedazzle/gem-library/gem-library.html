@@ -1,0 +1,26 @@
+<div class="library">
+  <div class="library__tabs" role="tablist" aria-label="Gem categories">
+    @for (category of categories(); track category.id) {
+      <button
+        type="button"
+        role="tab"
+        class="library__tab"
+        [class.active]="activeCategory() === category.id"
+        [attr.aria-selected]="activeCategory() === category.id"
+        (click)="categoryChange.emit(category.id)"
+      >
+        {{ category.label }}
+      </button>
+    }
+  </div>
+
+  <div class="library__grid">
+    @for (asset of filteredAssets(); track asset.id) {
+      <app-gem-picker-item
+        [asset]="asset"
+        [selected]="activeAssetId() === asset.id"
+        (picked)="assetChange.emit(asset.id)"
+      />
+    }
+  </div>
+</div>
