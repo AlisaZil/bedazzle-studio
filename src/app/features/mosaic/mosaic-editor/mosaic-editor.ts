@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
 import { MosaicEditorStore } from '../data/mosaic-editor-store';
 import { GEM_COLOUR_CATALOGUE } from '../data/gem-colour-catalogue';
@@ -57,12 +57,21 @@ const BACKGROUND_OPTIONS: readonly SegmentedSwitchOption[] = [
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MosaicEditor {
+  /** Set by BedazzleEditor when the mobile Start screen's own Mosaic path
+   * already resolved the Blank-canvas/Photo choice, so the first-entry
+   * "Mosaic settings" sheet below doesn't ask that same question again. */
+  readonly skipInitialSettings = input(false);
+
   protected readonly store = inject(MosaicEditorStore);
 
   protected readonly catalogue = GEM_COLOUR_CATALOGUE;
   protected readonly backgroundOptions = BACKGROUND_OPTIONS;
   protected readonly zoomMin = MOSAIC_ZOOM_MIN;
   protected readonly zoomMax = MOSAIC_ZOOM_MAX;
+
+  /** Matches shared/styles/breakpoints.scss's $desktop: 900px — computed
+   * once, same as BedazzleEditor's equivalent flag. */
+  private readonly isDesktopViewport = typeof window !== 'undefined' && window.matchMedia('(min-width: 900px)').matches;
 
   protected readonly shapeRatio = computed(() => getCanvasShape(this.store.canvasShapeId()).ratio);
   protected readonly gridOpacityPercent = computed(() => Math.round(this.store.gridOpacity() * 100));
@@ -75,6 +84,26 @@ export class MosaicEditor {
   protected readonly photoSetupOpen = signal(false);
   protected readonly showRestartConfirm = signal(false);
   protected readonly mobilePanelOpen = signal(false);
+  protected readonly moreSheetOpen = signal(false);
+
+  /** Mobile-only "settings first" gate: shown on first entry into an empty
+   * mosaic so switching modes never suddenly reveals a live paintable grid
+   * with no explanation. Never reappears once the user paints something or
+   * dismisses it (any dismissal path — Generate mosaic or closing the sheet
+   * — resolves it), and is simply always-resolved on desktop. */
+  private readonly settingsConfirmed = signal(this.isDesktopViewport);
+  protected readonly showMosaicSettings = computed(() => !this.settingsConfirmed() && this.store.cellCount() === 0);
+
+  constructor() {
+    // An effect rather than a constructor-time read: signal inputs bound
+    // from the parent aren't guaranteed resolved before the constructor
+    // body runs, but an effect always sees the current value once it is.
+    effect(() => {
+      if (this.skipInitialSettings()) {
+        this.settingsConfirmed.set(true);
+      }
+    });
+  }
 
   /** Mirrors MosaicCanvas's internal "moving the photo" flag, purely so the
    * hint strip (owned here, not by the canvas) can pick the right copy. */
@@ -196,6 +225,21 @@ export class MosaicEditor {
 
   onTogglePan(): void {
     this.panMode.update((v) => !v);
+  }
+
+  onOpenMore(): void {
+    this.moreSheetOpen.set(true);
+  }
+
+  onCloseMore(): void {
+    this.moreSheetOpen.set(false);
+  }
+
+  /** "Generate mosaic" and dismissing the settings sheet any other way
+   * (backdrop/X) both just reveal the canvas — there's nothing destructive
+   * about closing it either way since nothing's been painted yet. */
+  onResolveMosaicSettings(): void {
+    this.settingsConfirmed.set(true);
   }
 
   onRestartClick(): void {

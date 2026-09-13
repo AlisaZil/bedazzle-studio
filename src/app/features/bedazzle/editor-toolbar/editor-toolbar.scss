@@ -63,6 +63,25 @@
   }
 }
 
+// Replace photo / Size / Restart stay as direct toolbar buttons on desktop
+// (unchanged from before) but move into the mobile "More" sheet instead, to
+// keep the compact mobile toolbar down to 4 buttons.
+.toolbar__btn--desktop-only {
+  display: none;
+
+  @media (min-width: bp.$desktop) {
+    display: flex;
+  }
+}
+
+// The inverse: "More" (opens the sheet holding the actions above) only
+// exists on mobile — desktop already has them as direct buttons here.
+.toolbar__btn--more {
+  @media (min-width: bp.$desktop) {
+    display: none;
+  }
+}
+
 .toolbar__icon {
   font-size: 1.2rem;
   display: inline-block;

@@ -1,0 +1,205 @@
+:host {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: block;
+  background: var(--color-bg);
+}
+
+.start {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  height: 100vh;
+  overflow: hidden;
+  padding: var(--space-4);
+  padding-top: max(var(--space-4), env(safe-area-inset-top));
+  padding-bottom: max(var(--space-5), env(safe-area-inset-bottom));
+}
+
+.start__topbar {
+  flex-shrink: 0;
+}
+
+.start__logo {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--color-text);
+}
+
+// The two steps (mode pick, then explanation + canvas/photo choice) are
+// stacked on top of each other and cross-fade between — no horizontal
+// sliding — so switching steps reads as one smooth, gentle motion.
+.start__wizard-clip {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+}
+
+.start__panel {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 0 var(--space-1);
+  opacity: 0;
+  transform: translateY(8px);
+  pointer-events: none;
+  transition:
+    opacity var(--motion-panel, 320ms) var(--ease-standard, ease),
+    transform var(--motion-panel, 320ms) var(--ease-standard, ease);
+
+  &--active {
+    opacity: 1;
+    transform: none;
+    pointer-events: auto;
+  }
+}
+
+.start__back {
+  flex-shrink: 0;
+  align-self: flex-start;
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  margin: 0 0 var(--space-3);
+  padding: var(--space-2) var(--space-4);
+  min-height: 44px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: background-color 180ms var(--ease-standard);
+  margin-top: 20px;
+
+
+  &:active {
+    background: var(--color-surface-alt);
+  }
+}
+
+.start__back-icon {
+  font-size: 1.3rem;
+  line-height: 1;
+}
+
+.start__hero {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  text-align: center;
+}
+
+.start__hero-icon {
+  font-size: 2.5rem;
+  margin-bottom: var(--space-2);
+}
+
+.start__title {
+  margin: 0;
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--color-text);
+}
+
+.start__tagline {
+  margin: 0;
+  color: var(--color-text-muted);
+}
+
+.start__mode-options {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.start__mode-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 180ms var(--ease-standard),
+    background-color 180ms var(--ease-standard);
+
+  &:active {
+    background: var(--color-surface-alt);
+    border-color: var(--color-accent);
+  }
+}
+
+.start__mode-icon {
+  flex-shrink: 0;
+  font-size: 1.8rem;
+}
+
+.start__mode-card-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.start__mode-title {
+  font-weight: 800;
+  font-size: 1.05rem;
+  color: var(--color-text);
+}
+
+.start__mode-desc {
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+}
+
+.start__actions {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.start__btn {
+  min-height: 52px;
+  border-radius: var(--radius-pill);
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+
+  &--solid {
+    border: none;
+    background: var(--color-accent);
+    color: var(--color-accent-contrast);
+    box-shadow: var(--shadow-md);
+
+    &:active {
+      background: var(--color-accent-strong);
+    }
+  }
+
+  &--ghost {
+    border: 1px solid var(--color-border);
+    background: var(--color-surface);
+    color: var(--color-text);
+  }
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}

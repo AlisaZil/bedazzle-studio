@@ -1,11 +1,8 @@
 import { Service } from '@angular/core';
 import { CANVAS_LOGICAL_SIZE, EXPORT_PIXEL_SIZE } from './editor.constants';
 import { PlacedGemView } from './editor-models';
-import { ExportOutcome, deliverPngBlob } from '../../../shared/data/png-delivery';
 import { CanvasShapeId, computeCanvasDimensions, getCanvasShape } from '../../../shared/data/canvas-shape';
 import { drawTransformedPhoto } from '../../../shared/data/photo-transform';
-
-export type { ExportOutcome };
 
 export interface ExportSnapshot {
   readonly backgroundColor: string;
@@ -32,12 +29,13 @@ function resolveAssetUrl(path: string): string {
 
 /**
  * Renders the current design to a PNG via Canvas 2D (independent of the DOM,
- * so panels/toolbars/selection outlines never appear in the export) and
- * hands it to the user via `deliverPngBlob`.
+ * so panels/toolbars/selection outlines never appear in the export). Returns
+ * the rendered blob rather than delivering it — the caller (the shared
+ * SaveDialog) decides how the user actually gets it (download vs. share).
  */
 @Service()
 export class PngExport {
-  async exportPng(snapshot: ExportSnapshot, fileName = 'bedazzle-design.png'): Promise<ExportOutcome> {
+  async renderPng(snapshot: ExportSnapshot): Promise<Blob> {
     const shape = getCanvasShape(snapshot.canvasShapeId);
     const logical = computeCanvasDimensions(shape.ratio, CANVAS_LOGICAL_SIZE);
     const exportDims = computeCanvasDimensions(shape.ratio, EXPORT_PIXEL_SIZE);
@@ -90,6 +88,6 @@ export class PngExport {
       throw new Error('Could not generate the PNG file.');
     }
 
-    return deliverPngBlob(blob, fileName);
+    return blob;
   }
 }

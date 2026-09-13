@@ -23,4 +23,7 @@ export class MosaicToolbar {
   /** Opens the mobile panel (resolution/palette/zoom) — hidden on desktop,
    * where that panel is always visible as the side aside. */
   readonly openPanel = output<void>();
+  /** Opens the mobile-only "More" sheet (Replace photo/Undo/Restart) — on
+   * desktop those stay as direct buttons here, so this is mobile-only too. */
+  readonly openMore = output<void>();
 }

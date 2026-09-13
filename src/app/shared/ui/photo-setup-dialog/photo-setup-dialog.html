@@ -10,49 +10,71 @@
   </div>
 
   <div class="ps-card">
-    <div class="ps-card__header">
-      <div>
-        <h2 class="ps-card__title">Position your photo</h2>
-        <p class="ps-card__subtitle">Drag to move. Adjust the scale to find your crop.</p>
-      </div>
-
-      <app-canvas-shape-select [value]="canvasShapeId()" (valueChange)="canvasShapeRequested.emit($event)" />
-    </div>
-
-    <div class="ps-crop" [style.--aspect]="shapeRatio()">
-      <div
-        #surface
-        class="ps-crop__surface"
-        (pointerdown)="onPointerDown($event)"
-        (pointermove)="onPointerMove($event)"
-        (pointerup)="onPointerUp()"
-        (pointercancel)="onPointerUp()"
-      >
-        @if (photoUrl(); as url) {
-          <img
-            class="ps-crop__photo"
-            [src]="url"
-            [style.left.%]="photoLeftPct()"
-            [style.top.%]="photoTopPct()"
-            [style.width.%]="photoWidthPct()"
-            [style.height.%]="photoHeightPct()"
-            alt=""
-            draggable="false"
-          />
-        }
-
-        <div class="ps-crop__grid" aria-hidden="true">
-          <span class="ps-crop__grid-line ps-crop__grid-line--v1"></span>
-          <span class="ps-crop__grid-line ps-crop__grid-line--v2"></span>
-          <span class="ps-crop__grid-line ps-crop__grid-line--h1"></span>
-          <span class="ps-crop__grid-line ps-crop__grid-line--h2"></span>
+    <!-- Grouped so the mobile layout can scroll header+crop internally while
+         keeping Photo scale + actions pinned in a bottom section that's
+         always visible without scrolling past it. -->
+    <div class="ps-card__scroll">
+      <div class="ps-card__header">
+        <div>
+          <h2 class="ps-card__title">Position your photo</h2>
+          <p class="ps-card__subtitle">Drag to move. Adjust the scale to find your crop.</p>
         </div>
 
-        <span class="ps-crop__corner ps-crop__corner--tl" aria-hidden="true"></span>
-        <span class="ps-crop__corner ps-crop__corner--tr" aria-hidden="true"></span>
-        <span class="ps-crop__corner ps-crop__corner--bl" aria-hidden="true"></span>
-        <span class="ps-crop__corner ps-crop__corner--br" aria-hidden="true"></span>
+        <app-canvas-shape-select [value]="canvasShapeId()" (valueChange)="canvasShapeRequested.emit($event)" />
       </div>
+
+      <!-- Centers itself (mobile only, see .scss) in whatever room is left
+           below the header, instead of sitting flush at the top with all
+           the leftover space dumped below. Holds only the crop — the shape
+           buttons live outside this scrolling/centering region entirely
+           (see .ps-shape-mobile below) so changing the crop's aspect ratio
+           never shifts their position. -->
+      <div class="ps-crop-cluster">
+        <div class="ps-crop" [style.--aspect]="shapeRatio()">
+          <div
+            #surface
+            class="ps-crop__surface"
+            (pointerdown)="onPointerDown($event)"
+            (pointermove)="onPointerMove($event)"
+            (pointerup)="onPointerUp()"
+            (pointercancel)="onPointerUp()"
+          >
+            @if (photoUrl(); as url) {
+              <img
+                class="ps-crop__photo"
+                [src]="url"
+                [style.left.%]="photoLeftPct()"
+                [style.top.%]="photoTopPct()"
+                [style.width.%]="photoWidthPct()"
+                [style.height.%]="photoHeightPct()"
+                alt=""
+                draggable="false"
+              />
+            }
+
+            <div class="ps-crop__grid" aria-hidden="true">
+              <span class="ps-crop__grid-line ps-crop__grid-line--v1"></span>
+              <span class="ps-crop__grid-line ps-crop__grid-line--v2"></span>
+              <span class="ps-crop__grid-line ps-crop__grid-line--h1"></span>
+              <span class="ps-crop__grid-line ps-crop__grid-line--h2"></span>
+            </div>
+
+            <span class="ps-crop__corner ps-crop__corner--tl" aria-hidden="true"></span>
+            <span class="ps-crop__corner ps-crop__corner--tr" aria-hidden="true"></span>
+            <span class="ps-crop__corner ps-crop__corner--bl" aria-hidden="true"></span>
+            <span class="ps-crop__corner ps-crop__corner--br" aria-hidden="true"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile-only, and deliberately OUTSIDE .ps-card__scroll: fixed in
+         place right above Photo scale regardless of the crop's aspect ratio
+         (see .scss) — the header's compact dropdown is hidden below this
+         width in favour of this roomier three-button picker instead. -->
+    <div class="ps-shape-mobile">
+      <span class="ps-shape-mobile__label">Canvas shape</span>
+      <app-canvas-shape-control [value]="canvasShapeId()" (valueChange)="canvasShapeRequested.emit($event)" />
     </div>
 
     <div class="ps-scale-row">

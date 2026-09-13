@@ -19,8 +19,11 @@
 }
 
 .mosaic__bg-switch {
+  // The Blank-canvas/Photo choice lives in the mobile "Mosaic settings"
+  // sheet instead (shown once, before the grid appears) — desktop has no
+  // such sheet, so this stays visible there (see media query below).
+  display: none;
   grid-area: bg-switch;
-  display: flex;
   align-items: center;
   flex-wrap: wrap;
   gap: var(--space-3);
@@ -36,11 +39,82 @@
 }
 
 .mosaic__canvas-region {
+  position: relative;
   grid-area: canvas;
   display: flex;
   flex-direction: column;
   min-height: 0;
   padding: var(--space-3) var(--space-4);
+}
+
+// --- Floating mobile-only canvas controls -----------------------------------
+.mosaic__canvas-fab {
+  position: absolute;
+  z-index: 5;
+
+  &--tl,
+  &--tr {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 50%;
+    background: var(--color-surface);
+    color: var(--color-text);
+    box-shadow: var(--shadow-md);
+    font-size: 1.1rem;
+    cursor: pointer;
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: default;
+    }
+  }
+
+  &--tl {
+    top: var(--space-3);
+    left: var(--space-3);
+  }
+
+  &--tr {
+    top: var(--space-3);
+    right: var(--space-3);
+  }
+
+  &--bl {
+    bottom: var(--space-3);
+    left: var(--space-3);
+  }
+
+  &--br {
+    bottom: var(--space-3);
+    right: var(--space-3);
+  }
+
+  &--fit {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 50%;
+    background: var(--color-surface);
+    color: var(--color-text);
+    box-shadow: var(--shadow-md);
+    font-size: 1.1rem;
+    cursor: pointer;
+  }
+
+  // Nested here (not just as a separate desktop-scoped rule further down)
+  // so source order can never let an unconditional modifier declaration
+  // outrank this override — desktop already has these as direct
+  // toolbar/top-bar controls, so the floating duplicates are mobile-only.
+  @media (min-width: bp.$desktop) {
+    display: none;
+  }
 }
 
 .mosaic__hint {
@@ -67,6 +141,7 @@
   }
 
   .mosaic__bg-switch {
+    display: flex;
     justify-content: flex-start;
     padding: var(--space-4) var(--space-4) 0;
 
@@ -274,4 +349,79 @@
       background: var(--color-border);
     }
   }
+}
+
+// --- Mobile "Mosaic settings" sheet ------------------------------------------
+.mosaic-settings {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.mosaic-settings__section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.mosaic-settings__generate {
+  min-height: var(--touch-target);
+  border: none;
+  border-radius: var(--radius-md);
+  background: var(--color-accent);
+  color: var(--color-accent-contrast);
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      background: var(--color-accent-strong);
+    }
+  }
+}
+
+// --- Mobile "More" sheet: a plain vertical action list ----------------------
+.more-sheet {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.more-sheet__action {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: var(--touch-target);
+  padding: 0 var(--space-2);
+  border: none;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--color-text);
+  font-weight: 600;
+  font-size: 0.95rem;
+  text-align: left;
+  cursor: pointer;
+
+  &:disabled {
+    color: var(--color-text-muted);
+    opacity: 0.5;
+    cursor: default;
+  }
+
+  &--danger:not(:disabled) {
+    color: var(--color-danger);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    &:hover:not(:disabled) {
+      background: var(--color-surface-alt);
+    }
+  }
+}
+
+.more-sheet__icon {
+  font-size: 1.1rem;
+  width: 1.5em;
+  text-align: center;
 }

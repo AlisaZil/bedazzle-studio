@@ -39,6 +39,3 @@ export const GEM_EXIT_MS = 150;
 
 /** How long all gems fade out on restart, after confirmation. */
 export const RESTART_EXIT_MS = 180;
-
-/** How long the Save button shows its success checkmark before reverting. */
-export const SAVE_SUCCESS_MS = 1500;

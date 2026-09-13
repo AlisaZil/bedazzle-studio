@@ -4,7 +4,7 @@
     <span>Palette</span>
   </button>
   @if (mode() === 'photo') {
-    <button type="button" class="toolbar__btn" (click)="replacePhoto.emit()">
+    <button type="button" class="toolbar__btn toolbar__btn--desktop-only" (click)="replacePhoto.emit()">
       <span class="toolbar__icon" aria-hidden="true">🖼</span>
       <span>Replace photo</span>
     </button>
@@ -28,12 +28,16 @@
     <span>Pan</span>
   </button>
   <span class="toolbar__divider" aria-hidden="true"></span>
-  <button type="button" class="toolbar__btn" [disabled]="!canUndo()" (click)="undo.emit()">
+  <button type="button" class="toolbar__btn toolbar__btn--desktop-only" [disabled]="!canUndo()" (click)="undo.emit()">
     <span class="toolbar__icon" aria-hidden="true">↶</span>
     <span>Undo</span>
   </button>
-  <button type="button" class="toolbar__btn" [disabled]="!canRestart()" (click)="restart.emit()">
+  <button type="button" class="toolbar__btn toolbar__btn--desktop-only" [disabled]="!canRestart()" (click)="restart.emit()">
     <span class="toolbar__icon" aria-hidden="true">↺</span>
     <span>Restart</span>
+  </button>
+  <button type="button" class="toolbar__btn toolbar__btn--more" (click)="openMore.emit()">
+    <span class="toolbar__icon" aria-hidden="true">⋯</span>
+    <span>More</span>
   </button>
 </div>

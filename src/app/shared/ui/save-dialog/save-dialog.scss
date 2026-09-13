@@ -1,0 +1,135 @@
+@use '../../styles/buttons' as btn;
+
+.save-dialog {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  border: none;
+  border-radius: var(--radius-lg);
+  padding: var(--space-6) var(--space-5) var(--space-5);
+  max-width: 360px;
+  width: calc(100vw - var(--space-6));
+  background: var(--color-surface);
+  color: var(--color-text);
+  box-shadow: var(--shadow-lg);
+  text-align: center;
+
+  opacity: 0;
+  transform: scale(0.94);
+  transition:
+    opacity var(--motion-base) var(--ease-standard),
+    transform var(--motion-base) var(--ease-standard),
+    display var(--motion-base) allow-discrete,
+    overlay var(--motion-base) allow-discrete;
+
+  &[open] {
+    opacity: 1;
+    transform: scale(1);
+
+    @starting-style {
+      opacity: 0;
+      transform: scale(0.94);
+    }
+  }
+
+  &::backdrop {
+    background: rgba(53, 36, 63, 0);
+    transition: background-color var(--motion-base) var(--ease-standard);
+  }
+
+  &[open]::backdrop {
+    background: rgba(53, 36, 63, 0.35);
+
+    @starting-style {
+      background: rgba(53, 36, 63, 0);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition-duration: 0.01ms;
+  }
+}
+
+.save-dialog__sparkle {
+  font-size: 2.5rem;
+  color: var(--color-accent);
+  line-height: 1;
+}
+
+.save-dialog__title {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 800;
+}
+
+.save-dialog__subtitle {
+  margin: 0 0 var(--space-2);
+  color: var(--color-text-muted);
+}
+
+.save-dialog__error {
+  margin: 0;
+  color: var(--color-danger);
+  font-size: 0.85rem;
+}
+
+.save-dialog__actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  width: 100%;
+  margin-top: var(--space-2);
+}
+
+.save-dialog__btn {
+  @include btn.press-feedback;
+
+  min-height: var(--touch-target);
+  padding: 0 var(--space-5);
+  border-radius: var(--radius-md);
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+
+  &--solid {
+    border: none;
+    background: var(--color-accent);
+    color: var(--color-accent-contrast);
+
+    @media (hover: hover) and (pointer: fine) {
+      &:hover {
+        background: var(--color-accent-strong);
+      }
+    }
+  }
+
+  &--ghost {
+    border: 1px solid var(--color-border);
+    background: var(--color-surface);
+    color: var(--color-text);
+
+    @media (hover: hover) and (pointer: fine) {
+      &:hover:not(:disabled) {
+        background: var(--color-border);
+      }
+    }
+  }
+
+  &:disabled {
+    opacity: 0.7;
+    cursor: default;
+  }
+}
+
+.save-dialog__create-another {
+  margin-top: var(--space-2);
+  border: none;
+  background: transparent;
+  color: var(--color-accent-strong);
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-decoration: underline;
+  cursor: pointer;
+  min-height: var(--touch-target);
+}

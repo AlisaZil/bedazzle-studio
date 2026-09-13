@@ -1,174 +1,267 @@
-<div class="editor">
-  <app-editor-header class="editor__header" [saveState]="saveState()" [saveMessage]="saveMessage()" (save)="onSave()">
-    <app-segmented-switch [options]="editorModeOptions" [value]="editorMode()" ariaLabel="Editing mode" (valueChange)="onEditorModeChange($event)" />
-  </app-editor-header>
+@if (!editorStarted()) {
+  <app-mobile-start (photoFileSelected)="onStartWithPhoto($event)" (chooseBlank)="onChooseBlank($event)" />
+} @else {
+  <div class="editor">
+    <app-editor-header class="editor__header" [saveState]="saveState()" (save)="onSave()">
+      <app-segmented-switch [options]="editorModeOptions" [value]="editorMode()" ariaLabel="Editing mode" (valueChange)="onEditorModeChange($event)" />
+    </app-editor-header>
 
-  @if (editorMode() === 'freehand') {
-    <div class="editor__bg-switch">
-      <app-segmented-switch [options]="backgroundOptions" [value]="store.mode()" ariaLabel="Canvas background" (valueChange)="onModeChange($event)" />
+    @if (editorMode() === 'freehand') {
+      <div class="editor__bg-switch">
+        <app-segmented-switch [options]="backgroundOptions" [value]="store.mode()" ariaLabel="Canvas background" (valueChange)="onModeChange($event)" />
 
-      <!-- Desktop-only: the mobile sheet keeps its own Canvas shape section
-           (see .editor__shape-section--top-bar below). -->
-      <div class="editor__top-extra">
-        <span class="editor__divider" aria-hidden="true"></span>
-        <div class="editor__shape-field">
-          <span class="editor__field-label">Canvas shape</span>
-          <app-canvas-shape-select [value]="store.canvasShapeId()" (valueChange)="onCanvasShapeRequested($event)" />
+        <!-- Desktop-only: the mobile sheet keeps its own Canvas shape section
+             (see .editor__shape-section--top-bar below). -->
+        <div class="editor__top-extra">
+          <span class="editor__divider" aria-hidden="true"></span>
+          <div class="editor__shape-field">
+            <span class="editor__field-label">Canvas shape</span>
+            <app-canvas-shape-select [value]="store.canvasShapeId()" (valueChange)="onCanvasShapeRequested($event)" />
+          </div>
         </div>
       </div>
-    </div>
 
-    <div class="editor__canvas-region">
-      <app-design-canvas
-        #freehandCanvas
-        [mode]="store.mode()"
-        [backgroundColor]="store.backgroundColor()"
-        [canvasWidth]="store.canvasWidth()"
-        [canvasHeight]="store.canvasHeight()"
-        [photoUrl]="store.photoUrl()"
-        [photoOffsetX]="store.photoOffsetX()"
-        [photoOffsetY]="store.photoOffsetY()"
-        [photoScale]="store.photoScale()"
-        [photoZoomMin]="store.photoZoomRange.min"
-        [photoZoomMax]="store.photoZoomRange.max"
-        [gems]="store.gems()"
-        [selectedGemId]="store.selectedGemId()"
-        [exitingGemIds]="exitingGemIds()"
-        (placeAt)="onPlaceAt($event)"
-        (selectGem)="onSelectGem($event)"
-        (gemDragStart)="onGemDragStart()"
-        (gemDragTo)="onGemDragTo($event)"
-        (gemDragEnd)="onGemDragEnd()"
-        (gemResizeInput)="onSelectedSizeInput($event)"
-        (gemResizeCommitted)="onSelectedSizeCommitted($event)"
-        (photoFileSelected)="onPhotoFileSelected($event)"
-        (photoOffsetChange)="store.setPhotoOffset($event.x, $event.y)"
-        (photoScaleChange)="store.setPhotoScale($event)"
-        (adjustingPhotoChange)="adjustingPhoto.set($event)"
-      />
-    </div>
+      <div class="editor__canvas-region">
+        <!-- Floating, mobile-only (hidden on desktop, which already has
+             these as direct toolbar buttons) — CSS-hidden, see stylesheet. -->
+        @if (store.mode() === 'photo' && store.photoUrl()) {
+          <button type="button" class="editor__canvas-fab editor__canvas-fab--tl" (click)="freehandCanvas.triggerUpload()" aria-label="Replace photo">
+            <span aria-hidden="true">🖼</span>
+          </button>
+        }
+        <button
+          type="button"
+          class="editor__canvas-fab editor__canvas-fab--tr"
+          [disabled]="!store.canUndo()"
+          (click)="onUndo()"
+          aria-label="Undo"
+        >
+          <span aria-hidden="true">↶</span>
+        </button>
 
-    <app-editor-hint class="editor__hint" [text]="hintText()" />
-
-    @if (store.selectedGem(); as gem) {
-      <div class="editor__selected-mobile">
-        <app-selected-gem-controls
-          [assetSrc]="gem.asset.src"
-          [assetLabel]="gem.asset.label"
-          [size]="gem.size"
-          [sizeMin]="store.gemSizeRange.min"
-          [sizeMax]="store.gemSizeRange.max"
-          (sizeInput)="onSelectedSizeInput($event)"
-          (sizeCommitted)="onSelectedSizeCommitted($event)"
-          (duplicate)="store.duplicateSelected()"
-          (delete)="onDeleteSelected()"
+        <app-design-canvas
+          #freehandCanvas
+          [mode]="store.mode()"
+          [backgroundColor]="store.backgroundColor()"
+          [canvasWidth]="store.canvasWidth()"
+          [canvasHeight]="store.canvasHeight()"
+          [photoUrl]="store.photoUrl()"
+          [photoOffsetX]="store.photoOffsetX()"
+          [photoOffsetY]="store.photoOffsetY()"
+          [photoScale]="store.photoScale()"
+          [photoZoomMin]="store.photoZoomRange.min"
+          [photoZoomMax]="store.photoZoomRange.max"
+          [gems]="store.gems()"
+          [selectedGemId]="store.selectedGemId()"
+          [exitingGemIds]="exitingGemIds()"
+          (placeAt)="onPlaceAt($event)"
+          (selectGem)="onSelectGem($event)"
+          (gemDragStart)="onGemDragStart()"
+          (gemDragTo)="onGemDragTo($event)"
+          (gemDragEnd)="onGemDragEnd()"
+          (gemResizeInput)="onSelectedSizeInput($event)"
+          (gemResizeCommitted)="onSelectedSizeCommitted($event)"
+          (photoFileSelected)="onPhotoFileSelected($event)"
+          (photoOffsetChange)="store.setPhotoOffset($event.x, $event.y)"
+          (photoScaleChange)="store.setPhotoScale($event)"
+          (adjustingPhotoChange)="adjustingPhoto.set($event)"
         />
       </div>
+
+      <app-editor-hint class="editor__hint" [text]="hintText()" />
+
+      <app-editor-toolbar
+        class="editor__toolbar"
+        [mode]="store.mode()"
+        [canUndo]="store.canUndo()"
+        [canRestart]="store.canRestart()"
+        [sizePopoverOpen]="sizePopoverOpen()"
+        [gemSize]="store.newGemSize()"
+        [sizeMin]="store.gemSizeRange.min"
+        [sizeMax]="store.gemSizeRange.max"
+        [sizePreviewSrc]="sizePreviewSrc()"
+        [randomMode]="store.randomMode()"
+        (openGems)="onOpenGems()"
+        (replacePhoto)="freehandCanvas.triggerUpload()"
+        (openSize)="onOpenSizePopover()"
+        (closeSize)="onCloseSizePopover()"
+        (sizeInput)="store.setNewGemSize($event)"
+        (sizeCommitted)="store.setNewGemSize($event)"
+        (randomModeToggle)="store.toggleRandomMode()"
+        (undo)="onUndo()"
+        (restart)="onRestartClick()"
+        (openMore)="onOpenMore()"
+      />
+
+      <aside class="editor__aside">
+        <section class="editor__shape-section editor__shape-section--top-bar">
+          <h3 class="editor__shape-heading">Canvas shape</h3>
+          <app-canvas-shape-control [value]="store.canvasShapeId()" (valueChange)="onCanvasShapeRequested($event)" />
+        </section>
+
+        <app-gem-library
+          [assets]="catalogue"
+          [categories]="categories"
+          [activeCategory]="store.activeCategory()"
+          [activeAssetId]="store.activeAssetId()"
+          (categoryChange)="store.setActiveCategory($event)"
+          (assetChange)="store.setActiveAsset($event)"
+        />
+
+        @if (store.selectedGem(); as gem) {
+          <app-selected-gem-controls
+            [assetSrc]="gem.asset.src"
+            [assetLabel]="gem.asset.label"
+            [size]="gem.size"
+            [sizeMin]="store.gemSizeRange.min"
+            [sizeMax]="store.gemSizeRange.max"
+            (sizeInput)="onSelectedSizeInput($event)"
+            (sizeCommitted)="onSelectedSizeCommitted($event)"
+            (duplicate)="store.duplicateSelected()"
+            (delete)="onDeleteSelected()"
+          />
+        }
+      </aside>
+
+      <!-- Mobile-only: shows the currently-selected gem's contextual
+           controls when one is selected (auto-opened, see the constructor
+           effect), otherwise a compact "pick a gem to place" strip. -->
+      <app-gem-sheet
+        [open]="gemSheetOpen()"
+        [title]="!gemSheetShowPicker() && store.selectedGem() ? 'Selected gem' : 'Gems'"
+        [showConfirm]="false"
+        (closed)="onCloseGemSheet()"
+      >
+        @if (!gemSheetShowPicker() && store.selectedGem(); as gem) {
+          <app-selected-gem-controls
+            [assetSrc]="gem.asset.src"
+            [assetLabel]="gem.asset.label"
+            [size]="gem.size"
+            [sizeMin]="store.gemSizeRange.min"
+            [sizeMax]="store.gemSizeRange.max"
+            (sizeInput)="onSelectedSizeInput($event)"
+            (sizeCommitted)="onSelectedSizeCommitted($event)"
+            (duplicate)="store.duplicateSelected()"
+            (delete)="onDeleteSelected()"
+          />
+        } @else {
+          <div class="gem-quick-picker">
+            <div class="gem-quick-picker__header">
+              <button type="button" class="gem-quick-picker__see-all" (click)="seeAllGems.set(!seeAllGems())">
+                {{ seeAllGems() ? 'Show less' : 'See all' }} <span aria-hidden="true">›</span>
+              </button>
+            </div>
+
+            @if (seeAllGems()) {
+              <app-gem-library
+                [assets]="catalogue"
+                [categories]="categories"
+                [activeCategory]="store.activeCategory()"
+                [activeAssetId]="store.activeAssetId()"
+                (categoryChange)="store.setActiveCategory($event)"
+                (assetChange)="store.setActiveAsset($event)"
+              />
+            } @else {
+              <div class="gem-quick-picker__strip">
+                @for (asset of catalogue; track asset.id) {
+                  <app-gem-picker-item [asset]="asset" [selected]="store.activeAssetId() === asset.id" (picked)="store.setActiveAsset(asset.id)" />
+                }
+              </div>
+            }
+
+            <app-gem-size-control
+              label="Size"
+              [value]="store.newGemSize()"
+              [min]="store.gemSizeRange.min"
+              [max]="store.gemSizeRange.max"
+              (valueInput)="store.setNewGemSize($event)"
+              (valueCommitted)="store.setNewGemSize($event)"
+            />
+          </div>
+        }
+      </app-gem-sheet>
+
+      <!-- Mobile-only overflow: everything moved out of the compact bottom
+           toolbar. Desktop keeps these as direct toolbar buttons instead. -->
+      <app-gem-sheet [open]="moreSheetOpen()" title="More" [showConfirm]="false" (closed)="onCloseMore()">
+        <div class="more-sheet">
+          @if (store.mode() === 'photo') {
+            <button
+              type="button"
+              class="more-sheet__action"
+              (click)="freehandCanvas.triggerUpload(); onCloseMore()"
+            >
+              <span class="more-sheet__icon" aria-hidden="true">🖼</span>
+              <span>Replace photo</span>
+            </button>
+          }
+          @if (store.selectedGem()) {
+            <button type="button" class="more-sheet__action" (click)="store.duplicateSelected(); onCloseMore()">
+              <span class="more-sheet__icon" aria-hidden="true">⧉</span>
+              <span>Duplicate gem</span>
+            </button>
+            <button type="button" class="more-sheet__action more-sheet__action--danger" (click)="onDeleteSelected(); onCloseMore()">
+              <span class="more-sheet__icon" aria-hidden="true">🗑</span>
+              <span>Delete gem</span>
+            </button>
+          }
+          <button
+            type="button"
+            class="more-sheet__action more-sheet__action--danger"
+            [disabled]="!store.canRestart()"
+            (click)="onCloseMore(); onRestartClick()"
+          >
+            <span class="more-sheet__icon" aria-hidden="true">↺</span>
+            <span>Restart</span>
+          </button>
+        </div>
+      </app-gem-sheet>
+
+      <app-confirm-dialog
+        [open]="showRestartConfirm()"
+        title="Restart this design?"
+        message="This clears every placed gem. Your background or photo stays."
+        confirmLabel="Restart"
+        cancelLabel="Cancel"
+        (confirmed)="onRestartConfirm()"
+        (cancelled)="onRestartCancel()"
+      />
+
+      <app-confirm-dialog
+        [open]="pendingCanvasShape() !== null"
+        title="Change the canvas shape?"
+        message="This clears every placed gem. Your background or photo stays."
+        confirmLabel="Change shape"
+        cancelLabel="Cancel"
+        (confirmed)="onConfirmCanvasShapeChange()"
+        (cancelled)="onCancelCanvasShapeChange()"
+      />
+    } @else {
+      <app-mosaic-editor class="editor__mosaic-host" [skipInitialSettings]="mosaicSkipInitialSettings()" />
     }
 
-    <app-editor-toolbar
-      class="editor__toolbar"
-      [mode]="store.mode()"
-      [canUndo]="store.canUndo()"
-      [canRestart]="store.canRestart()"
-      [sizePopoverOpen]="sizePopoverOpen()"
-      [gemSize]="store.newGemSize()"
-      [sizeMin]="store.gemSizeRange.min"
-      [sizeMax]="store.gemSizeRange.max"
-      [sizePreviewSrc]="sizePreviewSrc()"
-      [randomMode]="store.randomMode()"
-      (openGems)="onOpenGems()"
-      (replacePhoto)="freehandCanvas.triggerUpload()"
-      (openSize)="onOpenSizePopover()"
-      (closeSize)="onCloseSizePopover()"
-      (sizeInput)="store.setNewGemSize($event)"
-      (sizeCommitted)="store.setNewGemSize($event)"
-      (randomModeToggle)="store.toggleRandomMode()"
-      (undo)="onUndo()"
-      (restart)="onRestartClick()"
-    />
+    @if (exportError(); as message) {
+      <p class="editor__error" role="alert">{{ message }}</p>
+    }
+  </div>
+}
 
-    <aside class="editor__aside">
-      <section class="editor__shape-section editor__shape-section--top-bar">
-        <h3 class="editor__shape-heading">Canvas shape</h3>
-        <app-canvas-shape-control [value]="store.canvasShapeId()" (valueChange)="onCanvasShapeRequested($event)" />
-      </section>
+<app-photo-setup-dialog
+  [open]="photoSetupOpen()"
+  [photoUrl]="pendingPhotoUrl()"
+  [canvasShapeId]="startFlowPending() === 'mosaic' ? mosaicStore.canvasShapeId() : store.canvasShapeId()"
+  [zoomMin]="startFlowPending() === 'mosaic' ? mosaicStore.photoZoomRange.min : store.photoZoomRange.min"
+  [zoomMax]="startFlowPending() === 'mosaic' ? mosaicStore.photoZoomRange.max : store.photoZoomRange.max"
+  (canvasShapeRequested)="onCanvasShapeRequested($event)"
+  (confirmed)="onPhotoSetupConfirmed($event)"
+  (cancelled)="onPhotoSetupCancelled()"
+/>
 
-      <app-gem-library
-        [assets]="catalogue"
-        [categories]="categories"
-        [activeCategory]="store.activeCategory()"
-        [activeAssetId]="store.activeAssetId()"
-        (categoryChange)="store.setActiveCategory($event)"
-        (assetChange)="store.setActiveAsset($event)"
-      />
-
-      @if (store.selectedGem(); as gem) {
-        <app-selected-gem-controls
-          [assetSrc]="gem.asset.src"
-          [assetLabel]="gem.asset.label"
-          [size]="gem.size"
-          [sizeMin]="store.gemSizeRange.min"
-          [sizeMax]="store.gemSizeRange.max"
-          (sizeInput)="onSelectedSizeInput($event)"
-          (sizeCommitted)="onSelectedSizeCommitted($event)"
-          (duplicate)="store.duplicateSelected()"
-          (delete)="onDeleteSelected()"
-        />
-      }
-    </aside>
-
-    <app-gem-sheet [open]="gemSheetOpen()" (closed)="onCloseGemSheet()">
-      <section class="editor__shape-section">
-        <h3 class="editor__shape-heading">Canvas shape</h3>
-        <app-canvas-shape-control [value]="store.canvasShapeId()" (valueChange)="onCanvasShapeRequested($event)" />
-      </section>
-
-      <app-gem-library
-        [assets]="catalogue"
-        [categories]="categories"
-        [activeCategory]="store.activeCategory()"
-        [activeAssetId]="store.activeAssetId()"
-        (categoryChange)="store.setActiveCategory($event)"
-        (assetChange)="store.setActiveAsset($event)"
-      />
-    </app-gem-sheet>
-
-    <app-confirm-dialog
-      [open]="showRestartConfirm()"
-      title="Restart this design?"
-      message="This clears every placed gem. Your background or photo stays."
-      confirmLabel="Restart"
-      cancelLabel="Cancel"
-      (confirmed)="onRestartConfirm()"
-      (cancelled)="onRestartCancel()"
-    />
-
-    <app-confirm-dialog
-      [open]="pendingCanvasShape() !== null"
-      title="Change the canvas shape?"
-      message="This clears every placed gem. Your background or photo stays."
-      confirmLabel="Change shape"
-      cancelLabel="Cancel"
-      (confirmed)="onConfirmCanvasShapeChange()"
-      (cancelled)="onCancelCanvasShapeChange()"
-    />
-
-    <app-photo-setup-dialog
-      [open]="photoSetupOpen()"
-      [photoUrl]="pendingPhotoUrl()"
-      [canvasShapeId]="store.canvasShapeId()"
-      [zoomMin]="store.photoZoomRange.min"
-      [zoomMax]="store.photoZoomRange.max"
-      (canvasShapeRequested)="onCanvasShapeRequested($event)"
-      (confirmed)="onPhotoSetupConfirmed($event)"
-      (cancelled)="onPhotoSetupCancelled()"
-    />
-  } @else {
-    <app-mosaic-editor class="editor__mosaic-host" />
-  }
-
-  @if (exportError(); as message) {
-    <p class="editor__error" role="alert">{{ message }}</p>
-  }
-</div>
+<app-save-dialog
+  [open]="saveDialogOpen()"
+  [blob]="savedBlob()"
+  [fileName]="saveFileName()"
+  [title]="editorMode() === 'mosaic' ? 'Your gem mosaic is ready' : 'Your sparkle masterpiece is ready'"
+  (closed)="onCloseSaveDialog()"
+  (createAnother)="onCreateAnother()"
+/>

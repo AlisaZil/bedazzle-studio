@@ -1,4 +1,9 @@
-<div class="sheet-backdrop" [class.open]="open()" (click)="closed.emit()"></div>
+<!-- pointerdown, not click: a tap that auto-opens this sheet mid-gesture (e.g.
+     placing/selecting a gem) still has its `click` land here right after,
+     since the backdrop only just became interactive — using pointerdown
+     means there's no second pointerdown in that same tap to trigger it,
+     while a genuine later tap-outside-to-dismiss still has one. -->
+<div class="sheet-backdrop" [class.open]="open()" (pointerdown)="closed.emit()"></div>
 <div class="sheet" [class.open]="open()" role="dialog" aria-modal="true" [attr.aria-label]="title()">
   <div class="sheet__handle"></div>
   <div class="sheet__header">

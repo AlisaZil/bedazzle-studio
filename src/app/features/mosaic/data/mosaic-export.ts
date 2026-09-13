@@ -2,7 +2,6 @@ import { Service } from '@angular/core';
 import { MOSAIC_CANVAS_LOGICAL_SIZE, MOSAIC_CELL_GEM_MARGIN, MOSAIC_EXPORT_PIXEL_SIZE } from './mosaic.constants';
 import { MosaicCell, MosaicResolution } from './mosaic-models';
 import { getGemColourSwatch } from './gem-colour-catalogue';
-import { ExportOutcome, deliverPngBlob } from '../../../shared/data/png-delivery';
 import { CanvasShapeId, computeCanvasDimensions, computeGridDimensions, getCanvasShape } from '../../../shared/data/canvas-shape';
 import { drawTransformedPhoto } from '../../../shared/data/photo-transform';
 
@@ -34,12 +33,13 @@ function resolveAssetUrl(path: string): string {
  * Renders the current mosaic to a PNG via Canvas 2D — independent of the
  * DOM, so grid lines, hover previews, panels and toolbars never appear in
  * the export regardless of what's currently shown on screen (including the
- * view-only zoom/pan, which this ignores entirely). Delivery (share/
- * download/preview fallback) is shared with the freehand editor's exporter.
+ * view-only zoom/pan, which this ignores entirely). Returns the rendered
+ * blob rather than delivering it — the caller (the shared SaveDialog)
+ * decides how the user actually gets it (download vs. share).
  */
 @Service()
 export class MosaicExport {
-  async exportPng(snapshot: MosaicExportSnapshot, fileName = 'bedazzle-mosaic.png'): Promise<ExportOutcome> {
+  async renderPng(snapshot: MosaicExportSnapshot): Promise<Blob> {
     const shape = getCanvasShape(snapshot.canvasShapeId);
     const logical = computeCanvasDimensions(shape.ratio, MOSAIC_CANVAS_LOGICAL_SIZE);
     const exportDims = computeCanvasDimensions(shape.ratio, MOSAIC_EXPORT_PIXEL_SIZE);
@@ -94,6 +94,6 @@ export class MosaicExport {
       throw new Error('Could not generate the PNG file.');
     }
 
-    return deliverPngBlob(blob, fileName);
+    return blob;
   }
 }

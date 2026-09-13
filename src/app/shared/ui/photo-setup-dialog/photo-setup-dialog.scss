@@ -78,11 +78,31 @@
   overflow-y: auto;
 }
 
+.ps-card__scroll {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-height: 0;
+}
+
 .ps-card__header {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   gap: var(--space-4);
+}
+
+.ps-crop-cluster {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+// Desktop keeps the compact header dropdown only — this roomier row (see
+// the mobile override below) would just be a redundant second control
+// there, where there's no leftover space below the crop to make use of.
+.ps-shape-mobile {
+  display: none;
 }
 
 .ps-card__title {
@@ -101,6 +121,12 @@
   align-self: center;
   width: min(100%, min(70vh, 560px) * var(--aspect, 1));
   container-type: inline-size;
+  // Both the width above and .ps-crop__surface's aspect-ratio below derive
+  // from the same --aspect custom property, so switching Square/Portrait/
+  // Landscape changes them both — transitioning each's own resolved value
+  // (rather than trying to animate --aspect itself) is what makes the whole
+  // box resize smoothly instead of snapping to the new shape instantly.
+  transition: width var(--motion-panel, 320ms) var(--ease-standard, ease);
 }
 
 .ps-crop__surface {
@@ -114,6 +140,7 @@
   touch-action: none;
   cursor: grab;
   isolation: isolate;
+  transition: aspect-ratio var(--motion-panel, 320ms) var(--ease-standard, ease);
 
   &:active {
     cursor: grabbing;
@@ -350,10 +377,66 @@
 @media (max-width: 640px) {
   .ps-card {
     padding: var(--space-4);
+    // Photo scale + actions move out of the scrolling content below and
+    // stay pinned in view — the crop image is what scrolls, if anything.
+    // min-height: 0 is required here: a flex item otherwise defaults to
+    // min-height: auto, which grows it to fit its content (header + crop +
+    // scale row + footer) instead of actually respecting flex: 1 and
+    // clipping to the space .ps-dialog has left — without it the whole
+    // card overflows the screen and the bottom section scrolls off too.
+    min-height: 0;
+    overflow-y: visible;
+  }
+
+  .ps-card__scroll {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+  }
+
+  .ps-shape-mobile,
+  .ps-scale-row,
+  .ps-footer {
+    flex-shrink: 0;
+  }
+
+  // A bit more room than the card's own gap gives it, so the buttons sit
+  // slightly higher above Photo scale rather than crowding it.
+  .ps-shape-mobile {
+    margin-bottom: var(--space-2);
   }
 
   .ps-card__header {
     flex-direction: column;
+    flex-shrink: 0;
+  }
+
+  // Auto margins (not justify-content: center on the scrolling container)
+  // so this only centers when there's slack — once the crop is tall enough
+  // to overflow (e.g. Portrait), the margins collapse to 0 and it scrolls
+  // from the top like normal instead of clipping unreachable content.
+  .ps-crop-cluster {
+    margin-top: auto;
+    margin-bottom: auto;
+  }
+
+  // The header's own dropdown is redundant once the three-button picker
+  // below is showing (same value, same output) — mobile keeps only one.
+  .ps-card__header app-canvas-shape-select {
+    display: none;
+  }
+
+  .ps-shape-mobile {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    margin-top: var(--space-3);
+  }
+
+  .ps-shape-mobile__label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--color-text);
   }
 
   .ps-footer {

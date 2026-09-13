@@ -48,6 +48,24 @@
   }
 }
 
+// Replace photo / Undo / Restart stay as direct toolbar buttons on desktop
+// (unchanged from before) but move into the mobile "More" sheet instead —
+// mobile also has real Undo/Replace-photo as floating canvas controls, so
+// nothing is actually lost, just decluttered from the compact bottom bar.
+.toolbar__btn--desktop-only {
+  display: none;
+
+  @media (min-width: bp.$desktop) {
+    display: flex;
+  }
+}
+
+.toolbar__btn--more {
+  @media (min-width: bp.$desktop) {
+    display: none;
+  }
+}
+
 .toolbar__icon {
   font-size: 1.2rem;
   display: inline-block;

@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, ElementRef, computed, effect, input
 import { CanvasShapeId, computeCanvasDimensions, getCanvasShape } from '../../data/canvas-shape';
 import { clampPhotoOffset, computePhotoBox } from '../../data/photo-transform';
 import { CanvasShapeSelect } from '../canvas-shape-select/canvas-shape-select';
+import { CanvasShapeControl } from '../canvas-shape-control/canvas-shape-control';
 
 export interface PhotoSetupResult {
   readonly offsetX: number;
@@ -37,7 +38,7 @@ const ZOOM_STEP = 0.1;
  */
 @Component({
   selector: 'app-photo-setup-dialog',
-  imports: [CanvasShapeSelect],
+  imports: [CanvasShapeSelect, CanvasShapeControl],
   templateUrl: './photo-setup-dialog.html',
   styleUrl: './photo-setup-dialog.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

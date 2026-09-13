@@ -31,6 +31,29 @@
   </div>
 
   <div class="mosaic__canvas-region">
+    <!-- Floating, mobile-only (hidden on desktop, which already has these
+         as direct toolbar/top-bar controls) — CSS-hidden, see stylesheet. -->
+    @if (store.mode() === 'photo' && store.photoUrl()) {
+      <button type="button" class="mosaic__canvas-fab mosaic__canvas-fab--tl" (click)="mosaicCanvasRef.triggerUpload()" aria-label="Replace photo">
+        <span aria-hidden="true">🖼</span>
+      </button>
+    }
+    <button
+      type="button"
+      class="mosaic__canvas-fab mosaic__canvas-fab--tr"
+      [disabled]="!store.canUndo()"
+      (click)="store.undo()"
+      aria-label="Undo"
+    >
+      <span aria-hidden="true">↶</span>
+    </button>
+    <div class="mosaic__canvas-fab mosaic__canvas-fab--bl">
+      <app-zoom-controls [zoom]="zoom()" [min]="zoomMin" [max]="zoomMax" (zoomOut)="onZoomOut()" (zoomIn)="onZoomIn()" (reset)="onZoomReset()" />
+    </div>
+    <button type="button" class="mosaic__canvas-fab mosaic__canvas-fab--br mosaic__canvas-fab--fit" (click)="mosaicCanvasRef.resetView()" aria-label="Fit">
+      <span aria-hidden="true">⛶</span>
+    </button>
+
     <app-mosaic-canvas
       #mosaicCanvasRef
       [mode]="store.mode()"
@@ -79,6 +102,7 @@
     (undo)="store.undo()"
     (restart)="onRestartClick()"
     (openPanel)="mobilePanelOpen.set(true)"
+    (openMore)="onOpenMore()"
   />
 
   <aside class="mosaic__aside">
@@ -129,6 +153,56 @@
     (confirmed)="onPhotoSetupConfirmed($event)"
     (cancelled)="onPhotoSetupCancelled()"
   />
+
+  <!-- Mobile-only: shown once, on first entry into an empty mosaic, instead
+       of the grid suddenly appearing paintable with no explanation. Combines
+       Mosaic's own source choice (no separate pre-entry Start step exists
+       for it) with its actual setup, all reusing existing controls. -->
+  <app-gem-sheet [open]="showMosaicSettings()" title="Mosaic settings" [showConfirm]="false" (closed)="onResolveMosaicSettings()">
+    <div class="mosaic-settings">
+      <section class="mosaic-settings__section">
+        <app-segmented-switch
+          [options]="backgroundOptions"
+          [value]="store.mode()"
+          ariaLabel="Canvas background"
+          (valueChange)="onBackgroundModeChange($event)"
+        />
+      </section>
+
+      <section class="mosaic-settings__section">
+        <h3 class="mosaic-panel__heading">Grid size</h3>
+        <app-grid-resolution-control [value]="store.resolution()" [shapeRatio]="shapeRatio()" (valueChange)="onResolutionRequested($event)" />
+      </section>
+
+      <section class="mosaic-settings__section">
+        <h3 class="mosaic-panel__heading">Colours</h3>
+        <app-gem-colour-box [swatches]="catalogue" [selectedId]="store.selectedColourId()" (colourChange)="store.setSelectedColour($event)" />
+      </section>
+
+      <button type="button" class="mosaic-settings__generate" (click)="onResolveMosaicSettings()">Generate mosaic</button>
+    </div>
+  </app-gem-sheet>
+
+  <!-- Mobile-only overflow: everything moved out of the compact bottom
+       toolbar. Desktop keeps these as direct toolbar buttons instead. -->
+  <app-gem-sheet [open]="moreSheetOpen()" title="More" [showConfirm]="false" (closed)="onCloseMore()">
+    <div class="more-sheet">
+      @if (store.mode() === 'photo') {
+        <button type="button" class="more-sheet__action" (click)="mosaicCanvasRef.triggerUpload(); onCloseMore()">
+          <span class="more-sheet__icon" aria-hidden="true">🖼</span>
+          <span>Replace photo</span>
+        </button>
+      }
+      <button type="button" class="more-sheet__action" [disabled]="!store.canUndo()" (click)="store.undo(); onCloseMore()">
+        <span class="more-sheet__icon" aria-hidden="true">↶</span>
+        <span>Undo</span>
+      </button>
+      <button type="button" class="more-sheet__action more-sheet__action--danger" [disabled]="!store.canRestart()" (click)="onCloseMore(); onRestartClick()">
+        <span class="more-sheet__icon" aria-hidden="true">↺</span>
+        <span>Restart</span>
+      </button>
+    </div>
+  </app-gem-sheet>
 </div>
 
 <ng-template #panelContent>

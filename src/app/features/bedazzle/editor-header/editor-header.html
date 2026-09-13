@@ -5,27 +5,13 @@
     <ng-content />
   </div>
 
-  <button
-    type="button"
-    class="header__save"
-    [class.saving]="saveState() === 'saving'"
-    [class.success]="saveState() === 'success'"
-    [disabled]="saveState() === 'saving'"
-    (click)="save.emit()"
-  >
+  <button type="button" class="header__save" [class.saving]="saveState() === 'saving'" [disabled]="saveState() === 'saving'" (click)="save.emit()">
     <span class="header__save-label">
-      @switch (saveState()) {
-        @case ('saving') {
-          <span class="header__spinner" aria-hidden="true"></span>
-          Saving…
-        }
-        @case ('success') {
-          <span aria-hidden="true">✓</span>
-          {{ saveMessage() }}
-        }
-        @default {
-          Save
-        }
+      @if (saveState() === 'saving') {
+        <span class="header__spinner" aria-hidden="true"></span>
+        Saving…
+      } @else {
+        Save
       }
     </span>
   </button>

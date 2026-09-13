@@ -38,4 +38,8 @@ export class EditorToolbar {
   readonly randomModeToggle = output<void>();
   readonly undo = output<void>();
   readonly restart = output<void>();
+  /** Opens the mobile-only "More" sheet (Replace photo/Duplicate/Delete/
+   * Restart) — on desktop those stay as direct buttons here, so this button
+   * itself is mobile-only (see .toolbar__btn--more in the stylesheet). */
+  readonly openMore = output<void>();
 }

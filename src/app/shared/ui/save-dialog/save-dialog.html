@@ -1,0 +1,20 @@
+<dialog #dialog class="save-dialog" (close)="onDialogClose()">
+  <div class="save-dialog__sparkle" aria-hidden="true">♡</div>
+  <h2 class="save-dialog__title">Saved!</h2>
+  <p class="save-dialog__subtitle">{{ title() }} ♡</p>
+
+  @if (shareError(); as message) {
+    <p class="save-dialog__error" role="alert">{{ message }}</p>
+  }
+
+  <div class="save-dialog__actions">
+    <button type="button" class="save-dialog__btn save-dialog__btn--solid" (click)="onDownload()">Download</button>
+    @if (canShare) {
+      <button type="button" class="save-dialog__btn save-dialog__btn--ghost" [disabled]="sharing()" (click)="onShare()">
+        {{ sharing() ? 'Sharing…' : 'Share' }}
+      </button>
+    }
+  </div>
+
+  <button type="button" class="save-dialog__create-another" (click)="onCreateAnother()">Create another</button>
+</dialog>

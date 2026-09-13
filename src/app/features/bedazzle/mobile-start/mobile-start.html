@@ -1,0 +1,51 @@
+<div class="start">
+  <div class="start__topbar">
+    <span class="start__logo">bedazzle studio <span aria-hidden="true">✨</span></span>
+  </div>
+
+  <div class="start__wizard-clip">
+    <div class="start__panel" [class.start__panel--active]="step() === 1">
+      <div class="start__hero">
+        <span class="start__hero-icon" aria-hidden="true">💜✨</span>
+        <h1 class="start__title">bedazzle studio <span aria-hidden="true">✨</span></h1>
+        <p class="start__tagline">What would you like to make?</p>
+      </div>
+
+      <div class="start__mode-options">
+        <button type="button" class="start__mode-card" (click)="onPickMode('freehand')">
+          <span class="start__mode-icon" aria-hidden="true">💎</span>
+          <span class="start__mode-card-text">
+            <span class="start__mode-title">Freehand</span>
+            <span class="start__mode-desc">Place gems anywhere — full creative control.</span>
+          </span>
+        </button>
+        <button type="button" class="start__mode-card" (click)="onPickMode('mosaic')">
+          <span class="start__mode-icon" aria-hidden="true">🔳</span>
+          <span class="start__mode-card-text">
+            <span class="start__mode-title">Gem mosaic</span>
+            <span class="start__mode-desc">Fill a grid automatically, one gem per square.</span>
+          </span>
+        </button>
+      </div>
+    </div>
+
+    <div class="start__panel" [class.start__panel--active]="step() === 2">
+      <button type="button" class="start__back" (click)="onBack()">
+        <span class="start__back-icon" aria-hidden="true">‹</span> Back
+      </button>
+
+      <div class="start__hero">
+        <span class="start__hero-icon" aria-hidden="true">{{ modeCopy().icon }}</span>
+        <h1 class="start__title">{{ modeCopy().title }}</h1>
+        <p class="start__tagline">{{ modeCopy().description }}</p>
+      </div>
+
+      <div class="start__actions">
+        <button type="button" class="start__btn start__btn--solid" (click)="openFilePicker()">Use a photo</button>
+        <button type="button" class="start__btn start__btn--ghost" (click)="onChooseBlank()">Blank canvas</button>
+      </div>
+    </div>
+  </div>
+
+  <input #fileInput type="file" accept="image/*" class="visually-hidden" (change)="onFileChange($event)" tabindex="-1" />
+</div>
